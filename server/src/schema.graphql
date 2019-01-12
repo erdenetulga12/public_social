@@ -1,0 +1,64 @@
+type Query {
+  feed: [Post!]!
+  drafts: [Post!]!
+  post(id: ID!): Post
+  comment(id: ID!): Comment
+  me: User
+}
+
+type Mutation {
+  signup(email: String!, password: String!, name: String!): AuthPayload!
+  login(email: String!, password: String!): AuthPayload!
+  createDraft(title: String!, content: String!): Post!
+  publish(id: ID!): Post!
+  deletePost(id: ID!): Post!
+  createComment(postId: ID!, content: String!): Comment!
+  deleteComment(commentId: ID!): Comment!
+  likePost(postId: ID!): Like!
+  likeComment(commentId: ID!): Like!
+  dislike(likeId: ID!): Like!
+}
+
+type Subscription {
+  feedSubscription: Post
+}
+
+type AuthPayload {
+  token: String!
+  user: User!
+}
+
+type User {
+  id: ID!
+  email: String!
+  name: String!
+  posts: [Post!]!
+  comments: [Comment!]!
+  likes: [Like!]!
+}
+
+type Post {
+  id: ID!
+  published: Boolean!
+  title: String!
+  content: String!
+  author: User!
+  comments: [Comment!]!
+  likes: [Like!]!
+  isLikedByUser: Boolean!
+}
+
+type Comment {
+  id: ID!
+  content: String!
+  author: User!
+  post: Post!
+  likes: [Like!]!
+}
+
+type Like {
+  id: ID!
+  author: User!
+  post: Post
+  comment: Comment
+}

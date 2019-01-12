@@ -1,0 +1,38 @@
+type Post {
+  id: ID! @unique
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  published: Boolean! @default(value: "false")
+  title: String!
+  content: String!
+  author: User!
+  comments: [Comment!]! @relation(name: "PostComments" onDelete: CASCADE)
+  likes: [Like!]! @relation(name: "PostLikes" onDelete: CASCADE)
+}
+
+type User {
+  id: ID! @unique
+  email: String! @unique
+  password: String!
+  name: String!
+  createdAt: DateTime!
+  posts: [Post!]!
+  comments: [Comment!]!
+  likes: [Like!]!
+}
+
+type Comment {
+  id: ID! @unique
+  author: User!
+  content: String!
+  post: Post! @relation(name: "PostComments")
+  likes: [Like!]! @relation(name: "CommentLikes" onDelete: CASCADE)
+}
+
+type Like {
+  id: ID! @unique
+  createdAt: DateTime!
+  author: User!
+  post: Post @relation(name: "PostLikes")
+  comment: Comment @relation(name: "CommentLikes")
+}
