@@ -7,7 +7,6 @@ const like = {
         id: postId,
         author: { id: userId }
     })
-    console.log(postId, 'hey something should')
     if(userPost) {
         throw new Error(`This post is yours`)
     }

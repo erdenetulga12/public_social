@@ -8,6 +8,8 @@ import {
   Redirect,
 } from 'react-router-dom'
 import FeedPage from './FeedPage'
+import ChatPage from './ChatPage'
+import ChatListPage from './ChatListPage'
 import DraftsPage from './DraftsPage'
 import CreatePage from './CreatePage'
 import DetailPage from './DetailPage'
@@ -104,6 +106,7 @@ class RootContainer extends Component {
           this.props.data.me &&
           this.props.data.me.email &&
           this.state.token && (
+            <Fragment>
             <NavLink
               className="link dim f6 f5-ns dib mr3 black"
               activeClassName="gray"
@@ -113,6 +116,16 @@ class RootContainer extends Component {
             >
               Drafts
             </NavLink>
+            <NavLink
+            className="link dim f6 f5-ns dib mr3 black"
+            activeClassName="gray"
+            exact={true}
+            to="/chat"
+            title="Chats"
+          >
+            Chats
+          </NavLink>
+          </Fragment>
           )}
         {this.state.token ? (
           <div
@@ -155,6 +168,15 @@ class RootContainer extends Component {
       <div className="fl w-100 pl4 pr4">
         <Switch>
           <Route exact path="/" component={FeedPage} />
+          <ProtectedRoute
+          token={this.state.token}
+          exact path="/chat"
+          component={ChatListPage}/>
+          <ProtectedRoute
+          token={this.state.token}
+          path="/chat/:chatId"
+          component={ChatPage}
+          />
           <ProtectedRoute
             token={this.state.token}
             path="/drafts"

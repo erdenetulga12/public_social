@@ -1,9 +1,9 @@
 import React, { Component, Fragment } from 'react'
-import Post from '../components/Post'
+    import Post from '../components/Post'
 import { graphql } from 'react-apollo'
 import  { gql } from 'apollo-boost'
 
-class FeedPage extends Component {
+class ChatPage extends Component {
   componentWillReceiveProps(nextProps) {
     if (this.props.location.key !== nextProps.location.key) {
       this.props.feedQuery.refetch()
@@ -95,4 +95,4 @@ export default graphql(FEED_QUERY, {
         })
       },
     }),
-})(FeedPage)
+})(ChatPage)

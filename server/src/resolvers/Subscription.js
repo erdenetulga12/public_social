@@ -11,17 +11,13 @@ const Subscription = {
   },
   chatSubscription: {
     subscribe: async (parent, { chatId }, context) => {
-      console.log(chatId, 'ChatID')
       const message = await context.prisma.$subscribe.message({
-          where:{
-            node:{
-              chat:{
-                id: chatId
-              }
+          node:{
+            chat:{
+              id: chatId
             }
-          },
+          }
         }).node()
-      console.log(message)
       return message
     },
     resolve: payload => {
