@@ -8,6 +8,15 @@ const User = {
   likes: ({ id }, args, context) => {
     return context.prisma.user({ id }).likes()
   },
+  myChats: ({ id }, args, context) => {
+    return context.prisma.user({ id }).myChats()
+  },
+  chats: ({ id }, args, context) => {
+    return context.prisma.user({ id }).chats()
+  },
+  messages: ({ id }, args, context) => {
+    return context.prisma.user({ id }).messages()
+  },
 }
 
 module.exports = {

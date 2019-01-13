@@ -4,6 +4,9 @@ type Query {
   post(id: ID!): Post
   comment(id: ID!): Comment
   me: User
+  chats: [Chat!]!
+  messages: [Message!]!
+  users: [User!]!
 }
 
 type Mutation {
@@ -17,6 +20,14 @@ type Mutation {
   likePost(postId: ID!): Like!
   likeComment(commentId: ID!): Like!
   dislike(likeId: ID!): Like!
+
+  createChat(name: String!): Chat!
+  deleteChat(chatId: ID!): Chat!
+  createMessage(chatId: ID!, content: String!): Message!
+  deleteMessage(messageId: ID!): Message!
+  editMessage(messageId: ID!, content: String!): Message!
+
+  addtoChat(chatId: ID!, userId: ID!): Chat!
 }
 
 type Subscription {
@@ -35,6 +46,9 @@ type User {
   posts: [Post!]!
   comments: [Comment!]!
   likes: [Like!]!
+  myChats: [Chat!]!
+  chats: [Chat!]!
+  messages: [Message!]!
 }
 
 type Post {
@@ -64,4 +78,21 @@ type Like {
   author: User!
   post: Post
   comment: Comment
+}
+
+type Chat {
+  id: ID!
+  name: String!
+  author: User!
+  users: [User!]!
+  messages: [Message!]!
+  isUserAuthor: Boolean!
+}
+
+type Message {
+  id: ID!
+  chat: Chat! 
+  author: User!
+  content: String!
+  isUserAuthor: Boolean!
 }

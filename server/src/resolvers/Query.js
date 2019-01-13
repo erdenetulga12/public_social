@@ -24,6 +24,20 @@ const Query = {
     const id = getUserId(context)
     return context.prisma.user({ id })
   },
+  chats(parent, args, context) {
+    return context.prisma.chats()
+  }, 
+  messages(parent, args, context) {
+    return context.prisma.messages()
+  },
+  users(parent, args, context) {
+    const userId = getUserId(context)
+    return context.prisma.users({
+      where: {
+        id_not: userId
+      }
+    })
+  },
 }
 
 module.exports = { Query }
