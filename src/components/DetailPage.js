@@ -3,18 +3,25 @@ import { graphql, compose } from 'react-apollo'
 import { withRouter } from 'react-router-dom'
 import  { gql } from 'apollo-boost'
 import Comment from './Comment'
+import CreateComment from './CreateComment'
 
 class DetailPage extends Component {
   constructor(props){
     super(props)
-    this.dislikePost = this.dislikePost.bind(this)
+    this.dislike = this.dislike.bind(this)
     this.likePost = this.likePost.bind(this)
+    this.likeComment = this.likeComment.bind(this)
+    this.handleComment = this.handleComment.bind(this)
+    this.deleteComment = this.deleteComment.bind(this)
   }
 
-  async dislikePost(){
+  async dislike(likeId){
     await this.props.dislike({
-      id: "ABCDE"
+      variables: {
+        likeId
+      }
     })
+    this.props.postQuery.refetch()
   }
 
   async likePost() {
@@ -23,6 +30,35 @@ class DetailPage extends Component {
         postId: this.props.match.params.id
       }
     })
+    this.props.postQuery.refetch()
+  }
+
+  async deleteComment(commentId) {
+    await this.props.deleteComment({
+      variables: {
+        commentId
+      }
+    })
+    this.props.postQuery.refetch()
+  }
+
+  handleComment = async content => {
+    await this.props.createComment({
+      variables: { 
+        postId: this.props.match.params.id,
+        content
+      },
+    })
+    this.props.postQuery.refetch()
+  }
+
+  async likeComment(commentId) {
+    await this.props.likeComment({
+      variables: {
+        commentId
+      }
+    })
+    this.props.postQuery.refetch()
   }
 
   render() {
@@ -40,20 +76,23 @@ class DetailPage extends Component {
 
     return (
       <Fragment>
-        <h1 className="f3 black-80 fw4 lh-solid">{post.title}</h1>
+        <h1 className="f3 black-80 fw4 lh-solid">{post.title} &nbsp;{post.isUserAuthor ? action : null}</h1>
         <p className="black-80 fw3">{post.content}</p>
         <p className="black-80 fw3">{post.likes.length}</p>
-        <p>{post.isLikedByUser ? <a  className="f6 dim br1 ba ph3 pv2 mb2 dib black pointer" onClick={() => this.likePost()}>
-            Like
-          </a> : <a  className="f6 dim br1 ba ph3 pv2 mb2 dib black pointer" onClick={() => this.dislike()}>
+        {post.isUserAuthor ? null : <p>{post.userPostLikeId ? <a  className="f6 dim br1 ba ph3 pv2 mb2 dib black pointer" onClick={() => this.dislike(post.userPostLikeId)}>
             Dislike
-          </a>}</p>
-        
-          
+          </a> :  <a  className="f6 dim br1 ba ph3 pv2 mb2 dib black pointer" onClick={() => this.likePost()}>
+            Like
+          </a>}
+          </p>}
+        <CreateComment handleComment={this.handleComment}/>
         {post.comments.map(comment => {
-          return (<Comment key={comment.id} comment={comment}/>)
+          return (<Comment key={comment.id} comment={comment}
+            likeComment={this.likeComment}
+            dislike={this.dislike}
+            deleteComment={this.deleteComment}
+          />)
         })}
-        {action}
       </Fragment>
     )
   }
@@ -113,7 +152,13 @@ const POST_QUERY = gql`
         name
       }
       comments {
+        id
         content
+        userCommentLikeId
+        isUserAuthor
+        likes{
+          id
+        }
         author{
           name
         }
@@ -124,20 +169,33 @@ const POST_QUERY = gql`
           name
         }
       }
-      isLikedByUser
+      userPostLikeId
+      isUserAuthor
     }
   }
 `
 
 const LIKE_POST_MUTATION = gql`
   mutation likePost($postId: ID!) {
-    id
+    likePost(postId: $postId) {
+      id
+    }
+  }
+`
+
+const LIKE_COMMENT_MUTATION = gql`
+  mutation likeComment($commentId: ID!) {
+    likeComment(commentId: $commentId) {
+      id
+    }
   }
 `
 
 const DISLIKE_MUTATION = gql`
   mutation dislike($likeId: ID!) {
-    id
+    dislike( likeId: $likeId){
+      id
+    }
   }
 `
 
@@ -146,6 +204,21 @@ const PUBLISH_MUTATION = gql`
     publish(id: $id) {
       id
       published
+    }
+  }
+`
+const CREATE_COMMENT_MUTATION = gql`
+  mutation CreateCommentMutation($content: String! $postId: ID!) {
+    createComment(content: $content, postId: $postId ) {
+      content
+    }
+  }
+`
+
+const DELETE_COMMENT_MUTATION = gql`
+  mutation deleteComment($commentId: ID!) {
+    deleteComment(commentId: $commentId){
+      id
     }
   }
 `
@@ -170,11 +243,20 @@ export default compose(
   graphql(PUBLISH_MUTATION, {
     name: 'publishDraft',
   }),
+  graphql(CREATE_COMMENT_MUTATION, {
+    name: 'createComment',
+  }),
+  graphql(DELETE_COMMENT_MUTATION, {
+    name: 'deleteComment',
+  }),
   graphql(DELETE_MUTATION, {
     name: 'deletePost',
   }),
   graphql(LIKE_POST_MUTATION, {
     name: 'likePost',
+  }),
+  graphql(LIKE_COMMENT_MUTATION, {
+    name: 'likeComment',
   }),
   graphql(DISLIKE_MUTATION, {
     name: 'dislike',

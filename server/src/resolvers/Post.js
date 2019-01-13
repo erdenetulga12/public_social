@@ -10,14 +10,25 @@ const Post = {
   likes: ({ id }, args, context) => {
     return context.prisma.post({ id }).likes()
   },
-  isLikedByUser: async ({id}, args, context) => {
+  userPostLikeId: async ({id}, args, context) => {
     const userId = getUserId(context)
-    const isLikedByUser = await context.prisma.$exists.like({
-      post: { id },
-      author: { id: userId}
+    const likes = await context.prisma.likes({
+      where: {
+        post: { id },
+        author: { id: userId }
+      }
     })
-    return isLikedByUser
-  }
+    if (likes.length === 0) return null
+    return likes[0].id
+  },
+  isUserAuthor: async ({id}, args, context) => {
+    const userId = getUserId(context)
+    const isAuthor = await context.prisma.$exists.post({
+        id,
+        author: { id: userId }
+    })
+    return isAuthor
+  },
 }
 
 module.exports = {

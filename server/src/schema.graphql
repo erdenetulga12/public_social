@@ -45,7 +45,8 @@ type Post {
   author: User!
   comments: [Comment!]!
   likes: [Like!]!
-  isLikedByUser: Boolean!
+  userPostLikeId: ID
+  isUserAuthor: Boolean!
 }
 
 type Comment {
@@ -53,6 +54,8 @@ type Comment {
   content: String!
   author: User!
   post: Post!
+  userCommentLikeId: ID
+  isUserAuthor: Boolean!
   likes: [Like!]!
 }
 
