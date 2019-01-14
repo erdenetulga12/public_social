@@ -38,40 +38,39 @@ class ChatPage extends Component {
   messageEdit(message) {
     const { id, content } = message
     this.setState({
-        currentMessageId: id,
-        currentMessageContent: content
+      currentMessageId: id,
+      currentMessageContent: content,
     })
   }
 
   async addUser(userId) {
     await this.props.addUser({
-        variables:{
-            userId,
-            chatId: this.props.match.params.chatId,
-        }
+      variables: {
+        userId,
+        chatId: this.props.match.params.chatId,
+      },
     })
   }
 
-  async messageSubmit(){
-      const { currentMessageContent, currentMessageId} = this.state
-      if (currentMessageId) {
-        await this.props.messageEdit({
-            variables: {
-                messageId: currentMessageId,
-                content: currentMessageContent
-            }
-        })
-      } else {
-        await this.props.messageCreate({
-            variables: {
-                chatId: this.props.match.params.chatId,
-                content: currentMessageContent
-            }
-        })
-      }
-      this.setState({ currentMessageId: undefined, currentMessageContent: ''})
+  async messageSubmit() {
+    const { currentMessageContent, currentMessageId } = this.state
+    if (currentMessageId) {
+      await this.props.messageEdit({
+        variables: {
+          messageId: currentMessageId,
+          content: currentMessageContent,
+        },
+      })
+    } else {
+      await this.props.messageCreate({
+        variables: {
+          chatId: this.props.match.params.chatId,
+          content: currentMessageContent,
+        },
+      })
+    }
+    this.setState({ currentMessageId: undefined, currentMessageContent: '' })
   }
-
 
   render() {
     if (this.props.chatQuery.loading) {
@@ -86,16 +85,22 @@ class ChatPage extends Component {
       <Fragment>
         <h1>Communication</h1>
         {this.props.chatQuery.chat.users.map(user => (
-            <li key={user.id}>{user.name}</li>
-        ))
-        }
+          <li key={user.id}>{user.name}</li>
+        ))}
         <p>ADD USER</p>
-        {this.props.users.users.filter(user => !this.props.chatQuery.chat.users.find(item => item.id === user.id)).map(user => (
-            <li key={user.id}>{user.name}
-            <button onClick={()=> this.addUser(user.id)}>ADD</button>
+        {this.props.users.users
+          .filter(
+            user =>
+              !this.props.chatQuery.chat.users.find(
+                item => item.id === user.id,
+              ),
+          )
+          .map(user => (
+            <li key={user.id}>
+              {user.name}
+              <button onClick={() => this.addUser(user.id)}>ADD</button>
             </li>
-        ))
-        }
+          ))}
         <p>CHAT</p>
         {this.props.chatQuery.chat &&
           this.props.chatQuery.chat.messages.map(message => (
@@ -110,12 +115,21 @@ class ChatPage extends Component {
         <textarea
           className="db w-100 ba bw1 b--black-20 pa2 br2 mb2"
           cols={50}
-          onChange={e => this.setState({ currentMessageContent: e.target.value })}
+          onChange={e =>
+            this.setState({ currentMessageContent: e.target.value })
+          }
+          onKeyPress={e => {
+            if (e.key === 'Enter') {
+              this.messageSubmit()
+            }
+          }}
           placeholder="Content"
           rows={8}
           value={this.state.currentMessageContent}
         />
-        <button onClick={()=> this.messageSubmit()} >{this.state.currentMessageId ? 'Update' : 'Send'}</button>
+        <button onClick={() => this.messageSubmit()}>
+          {this.state.currentMessageId ? 'Update' : 'Send'}
+        </button>
       </Fragment>
     )
   }
@@ -157,44 +171,51 @@ const CHAT_SUBSCRIPTION = gql`
     }
   }
 `
-const USERS = gql`{
-    users{
-        name
-        id
+
+const USERS = gql`
+  {
+    users {
+      name
+      id
     }
-}`
+  }
+`
 
 const MESSAGE_CREATE = gql`
   mutation createMessage($chatId: ID!, $content: String!) {
     createMessage(chatId: $chatId, content: $content) {
-        id
+      id
     }
-  }`
+  }
+`
 
 const MESSAGE_DELETE = gql`
   mutation deleteMessage($messageId: ID!) {
     deleteMessage(messageId: $messageId) {
       content
     }
-  }`
+  }
+`
 const MESSAGE_EDIT = gql`
   mutation editMessage($messageId: ID!, $content: String!) {
     editMessage(messageId: $messageId, content: $content) {
-        id
+      id
       content
     }
-  }`
+  }
+`
 
 const ADD_USER = gql`
-mutation addtoChat($userId: ID!, $chatId: ID!) {
-  addtoChat(userId: $userId, chatId: $chatId){
-    id
-    users{
+  mutation addtoChat($userId: ID!, $chatId: ID!) {
+    addtoChat(userId: $userId, chatId: $chatId) {
+      id
+      users {
         id
         name
+      }
     }
   }
-}`
+`
 
 export default compose(
   graphql(CHAT_QUERY, {
@@ -208,7 +229,6 @@ export default compose(
     props: props =>
       Object.assign({}, props, {
         subscribeToNewChat: params => {
-          console.log(params, 'PARAMS')
           return props.chatQuery.subscribeToMore({
             document: CHAT_SUBSCRIPTION,
             variables: {
@@ -218,8 +238,6 @@ export default compose(
               if (!subscriptionData.data) {
                 return prev
               }
-              console.log('PREV', prev)
-              console.log('SUBSCRIPTION', subscriptionData)
               const newMessage = subscriptionData.data.chatSubscription
               if (
                 prev.chat.messages.find(message => message.id === newMessage.id)

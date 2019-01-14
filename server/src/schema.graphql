@@ -93,7 +93,7 @@ type Chat {
 
 type Message {
   id: ID!
-  chat: Chat! 
+  chat: Chat!
   author: User!
   content: String!
   isUserAuthor: Boolean!

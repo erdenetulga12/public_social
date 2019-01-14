@@ -21,14 +21,11 @@ class ChatListPage extends Component {
     if (this.props.chats.loading) return <div />
     return (
       <Fragment>
-        
         <h1>Chats</h1>
         {this.props.chats.chats.map(chat => {
           return (
-            <Fragment>
-              <Link key={chat.id} to={`chat/${chat.id}`}>
-                {chat.name}
-              </Link>
+            <Fragment key={chat.id}>
+              <Link to={`chat/${chat.id}`}>{chat.name}</Link>
               &nbsp;
               <strong>by {chat.author.name}</strong>
               <button onClick={() => this.deleteChat(chat.id)}>Delete</button>

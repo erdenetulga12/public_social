@@ -1,9 +1,11 @@
 const Subscription = {
   feedSubscription: {
     subscribe: async (parent, args, context) => {
-      return context.prisma.$subscribe.post({
+      return context.prisma.$subscribe
+        .post({
           mutation_in: ['CREATED', 'UPDATED'],
-        }).node()
+        })
+        .node()
     },
     resolve: payload => {
       return payload
@@ -11,13 +13,16 @@ const Subscription = {
   },
   chatSubscription: {
     subscribe: async (parent, { chatId }, context) => {
-      const message = await context.prisma.$subscribe.message({
-          node:{
-            chat:{
-              id: chatId
-            }
-          }
-        }).node()
+      const message = await context.prisma.$subscribe
+        .message({
+          mutation_in: ['CREATED', 'UPDATED'],
+          node: {
+            chat: {
+              id: chatId,
+            },
+          },
+        })
+        .node()
       return message
     },
     resolve: payload => {

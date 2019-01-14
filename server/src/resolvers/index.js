@@ -23,7 +23,6 @@ module.exports = {
     ...comment,
     ...chat,
     ...message,
-    
   },
   Subscription,
   User,

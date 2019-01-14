@@ -19,17 +19,17 @@ const Query = {
   },
   comment(parent, { id }, context) {
     return context.prisma.comment({ id })
-  }, 
+  },
   me(parent, args, context) {
     const id = getUserId(context)
     return context.prisma.user({ id })
   },
   chat(parent, { chatId }, context) {
     return context.prisma.chat({ id: chatId })
-  }, 
+  },
   chats(parent, args, context) {
     return context.prisma.chats()
-  }, 
+  },
   messages(parent, args, context) {
     return context.prisma.messages()
   },
@@ -37,8 +37,8 @@ const Query = {
     const userId = getUserId(context)
     return context.prisma.users({
       where: {
-        id_not: userId
-      }
+        id_not: userId,
+      },
     })
   },
 }
