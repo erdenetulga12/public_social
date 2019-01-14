@@ -29,7 +29,7 @@ const middlewareLink = new ApolloLink((operation, forward) => {
 const httpLinkAuth = middlewareLink.concat(httpLink)
 
 const wsLink = new WebSocketLink({
-  uri: `wss://intense-badlands-58863.herokuapp.com/`,
+  uri: `wss://whispering-sierra-98847.herokuapp.com/graphql`,
   options: {
     reconnect: true,
     connectionParams: {
