@@ -17,7 +17,7 @@ class ChatPage extends Component {
     this.addUser = this.addUser.bind(this)
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (this.props.location.key !== nextProps.location.key) {
       this.props.chatQuery.refetch()
     }

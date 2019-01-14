@@ -4,7 +4,7 @@ import { graphql } from 'react-apollo'
 import { gql } from 'apollo-boost'
 
 class FeedPage extends Component {
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (this.props.location.key !== nextProps.location.key) {
       this.props.feedQuery.refetch()
     }
