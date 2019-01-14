@@ -14,6 +14,7 @@ class ChatPage extends Component {
     this.messageDelete = this.messageDelete.bind(this)
     this.messageEdit = this.messageEdit.bind(this)
     this.messageSubmit = this.messageSubmit.bind(this)
+    this.addUser = this.addUser.bind(this)
   }
 
   componentWillReceiveProps(nextProps) {
@@ -39,6 +40,15 @@ class ChatPage extends Component {
     this.setState({
         currentMessageId: id,
         currentMessageContent: content
+    })
+  }
+
+  async addUser(userId) {
+    await this.props.addUser({
+        variables:{
+            userId,
+            chatId: this.props.match.params.chatId,
+        }
     })
   }
 
@@ -75,6 +85,18 @@ class ChatPage extends Component {
     return (
       <Fragment>
         <h1>Communication</h1>
+        {this.props.chatQuery.chat.users.map(user => (
+            <li key={user.id}>{user.name}</li>
+        ))
+        }
+        <p>ADD USER</p>
+        {this.props.users.users.filter(user => !this.props.chatQuery.chat.users.find(item => item.id === user.id)).map(user => (
+            <li key={user.id}>{user.name}
+            <button onClick={()=> this.addUser(user.id)}>ADD</button>
+            </li>
+        ))
+        }
+        <p>CHAT</p>
         {this.props.chatQuery.chat &&
           this.props.chatQuery.chat.messages.map(message => (
             <Message
@@ -135,6 +157,13 @@ const CHAT_SUBSCRIPTION = gql`
     }
   }
 `
+const USERS = gql`{
+    users{
+        name
+        id
+    }
+}`
+
 const MESSAGE_CREATE = gql`
   mutation createMessage($chatId: ID!, $content: String!) {
     createMessage(chatId: $chatId, content: $content) {
@@ -147,16 +176,25 @@ const MESSAGE_DELETE = gql`
     deleteMessage(messageId: $messageId) {
       content
     }
-  }
-`
+  }`
 const MESSAGE_EDIT = gql`
   mutation editMessage($messageId: ID!, $content: String!) {
     editMessage(messageId: $messageId, content: $content) {
         id
       content
     }
+  }`
+
+const ADD_USER = gql`
+mutation addtoChat($userId: ID!, $chatId: ID!) {
+  addtoChat(userId: $userId, chatId: $chatId){
+    id
+    users{
+        id
+        name
+    }
   }
-`
+}`
 
 export default compose(
   graphql(CHAT_QUERY, {
@@ -207,6 +245,12 @@ export default compose(
   }),
   graphql(MESSAGE_CREATE, {
     name: 'messageCreate',
+  }),
+  graphql(USERS, {
+    name: 'users',
+  }),
+  graphql(ADD_USER, {
+    name: 'addUser',
   }),
   withRouter,
 )(ChatPage)
