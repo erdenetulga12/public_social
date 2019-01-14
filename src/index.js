@@ -11,7 +11,7 @@ import { ApolloProvider } from 'react-apollo'
 import 'tachyons'
 import './index.css'
 
-const httpLink = new HttpLink({ uri: '/graphql' })
+const httpLink = new HttpLink({ uri: 'https://whispering-sierra-98847.herokuapp.com/graphql' })
 
 const middlewareLink = new ApolloLink((operation, forward) => {
   // get the authentication token from local storage if it exists
