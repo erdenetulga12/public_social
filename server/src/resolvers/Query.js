@@ -24,6 +24,9 @@ const Query = {
     const id = getUserId(context)
     return context.prisma.user({ id })
   },
+  chat(parent, { chatId }, context) {
+    return context.prisma.chat({ id: chatId })
+  }, 
   chats(parent, args, context) {
     return context.prisma.chats()
   }, 

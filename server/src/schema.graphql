@@ -5,6 +5,7 @@ type Query {
   comment(id: ID!): Comment
   me: User
   chats: [Chat!]!
+  chat(chatId: ID!): Chat
   messages: [Message!]!
   users: [User!]!
 }
