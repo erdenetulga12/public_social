@@ -8,6 +8,8 @@ import {
   Redirect,
 } from 'react-router-dom'
 import FeedPage from './FeedPage'
+import ChatPage from './ChatPage'
+import ChatListPage from './ChatListPage'
 import DraftsPage from './DraftsPage'
 import CreatePage from './CreatePage'
 import DetailPage from './DetailPage'
@@ -18,7 +20,7 @@ import LogoutPage from './LogoutPage'
 import { AUTH_TOKEN } from '../constant'
 import { isTokenExpired } from '../helper/jwtHelper'
 import { graphql } from 'react-apollo'
-import  { gql } from 'apollo-boost'
+import { gql } from 'apollo-boost'
 
 const ProtectedRoute = ({ component: Component, token, ...rest }) => {
   return token ? (
@@ -104,15 +106,26 @@ class RootContainer extends Component {
           this.props.data.me &&
           this.props.data.me.email &&
           this.state.token && (
-            <NavLink
-              className="link dim f6 f5-ns dib mr3 black"
-              activeClassName="gray"
-              exact={true}
-              to="/drafts"
-              title="Drafts"
-            >
-              Drafts
-            </NavLink>
+            <Fragment>
+              <NavLink
+                className="link dim f6 f5-ns dib mr3 black"
+                activeClassName="gray"
+                exact={true}
+                to="/drafts"
+                title="Drafts"
+              >
+                Drafts
+              </NavLink>
+              <NavLink
+                className="link dim f6 f5-ns dib mr3 black"
+                activeClassName="gray"
+                exact={true}
+                to="/chat"
+                title="Chats"
+              >
+                Chats
+              </NavLink>
+            </Fragment>
           )}
         {this.state.token ? (
           <div
@@ -155,6 +168,17 @@ class RootContainer extends Component {
       <div className="fl w-100 pl4 pr4">
         <Switch>
           <Route exact path="/" component={FeedPage} />
+          <ProtectedRoute
+            token={this.state.token}
+            exact
+            path="/chat"
+            component={ChatListPage}
+          />
+          <ProtectedRoute
+            token={this.state.token}
+            path="/chat/:chatId"
+            component={ChatPage}
+          />
           <ProtectedRoute
             token={this.state.token}
             path="/drafts"

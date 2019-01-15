@@ -1,7 +1,12 @@
 const jwt = require('jsonwebtoken')
 
 function getUserId(context) {
-  const Authorization = context.request.get('Authorization')
+  let Authorization
+  if (context.request) {
+    Authorization = context.request.get('Authorization')
+  } else {
+    ;({ Authorization } = context.connection.context)
+  }
   if (Authorization) {
     const token = Authorization.replace('Bearer ', '')
     const { userId } = jwt.verify(token, process.env.APP_SECRET)
@@ -11,7 +16,6 @@ function getUserId(context) {
   throw new AuthError()
 }
 
-
 class AuthError extends Error {
   constructor() {
     super('Not authorized')
@@ -20,5 +24,5 @@ class AuthError extends Error {
 
 module.exports = {
   getUserId,
-  AuthError
+  AuthError,
 }

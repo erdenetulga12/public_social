@@ -1,12 +1,12 @@
 import React, { Component, Fragment } from 'react'
 import { graphql, compose } from 'react-apollo'
 import { withRouter } from 'react-router-dom'
-import  { gql } from 'apollo-boost'
+import { gql } from 'apollo-boost'
 import Comment from './Comment'
 import CreateComment from './CreateComment'
 
 class DetailPage extends Component {
-  constructor(props){
+  constructor(props) {
     super(props)
     this.dislike = this.dislike.bind(this)
     this.likePost = this.likePost.bind(this)
@@ -15,11 +15,11 @@ class DetailPage extends Component {
     this.deleteComment = this.deleteComment.bind(this)
   }
 
-  async dislike(likeId){
+  async dislike(likeId) {
     await this.props.dislike({
       variables: {
-        likeId
-      }
+        likeId,
+      },
     })
     this.props.postQuery.refetch()
   }
@@ -27,8 +27,8 @@ class DetailPage extends Component {
   async likePost() {
     await this.props.likePost({
       variables: {
-        postId: this.props.match.params.id
-      }
+        postId: this.props.match.params.id,
+      },
     })
     this.props.postQuery.refetch()
   }
@@ -36,17 +36,17 @@ class DetailPage extends Component {
   async deleteComment(commentId) {
     await this.props.deleteComment({
       variables: {
-        commentId
-      }
+        commentId,
+      },
     })
     this.props.postQuery.refetch()
   }
 
   handleComment = async content => {
     await this.props.createComment({
-      variables: { 
+      variables: {
         postId: this.props.match.params.id,
-        content
+        content,
       },
     })
     this.props.postQuery.refetch()
@@ -55,8 +55,8 @@ class DetailPage extends Component {
   async likeComment(commentId) {
     await this.props.likeComment({
       variables: {
-        commentId
-      }
+        commentId,
+      },
     })
     this.props.postQuery.refetch()
   }
@@ -76,22 +76,41 @@ class DetailPage extends Component {
 
     return (
       <Fragment>
-        <h1 className="f3 black-80 fw4 lh-solid">{post.title} &nbsp;{post.isUserAuthor ? action : null}</h1>
+        <h1 className="f3 black-80 fw4 lh-solid">
+          {post.title} &nbsp;{post.isUserAuthor ? action : null}
+        </h1>
         <p className="black-80 fw3">{post.content}</p>
         <p className="black-80 fw3">{post.likes.length}</p>
-        {post.isUserAuthor ? null : <p>{post.userPostLikeId ? <a  className="f6 dim br1 ba ph3 pv2 mb2 dib black pointer" onClick={() => this.dislike(post.userPostLikeId)}>
-            Dislike
-          </a> :  <a  className="f6 dim br1 ba ph3 pv2 mb2 dib black pointer" onClick={() => this.likePost()}>
-            Like
-          </a>}
-          </p>}
-        <CreateComment handleComment={this.handleComment}/>
+        {post.isUserAuthor ? null : (
+          <p>
+            {post.userPostLikeId ? (
+              <a
+                className="f6 dim br1 ba ph3 pv2 mb2 dib black pointer"
+                onClick={() => this.dislike(post.userPostLikeId)}
+              >
+                Dislike
+              </a>
+            ) : (
+              <a
+                className="f6 dim br1 ba ph3 pv2 mb2 dib black pointer"
+                onClick={() => this.likePost()}
+              >
+                Like
+              </a>
+            )}
+          </p>
+        )}
+        <CreateComment handleComment={this.handleComment} />
         {post.comments.map(comment => {
-          return (<Comment key={comment.id} comment={comment}
-            likeComment={this.likeComment}
-            dislike={this.dislike}
-            deleteComment={this.deleteComment}
-          />)
+          return (
+            <Comment
+              key={comment.id}
+              comment={comment}
+              likeComment={this.likeComment}
+              dislike={this.dislike}
+              deleteComment={this.deleteComment}
+            />
+          )
         })}
       </Fragment>
     )
@@ -156,16 +175,16 @@ const POST_QUERY = gql`
         content
         userCommentLikeId
         isUserAuthor
-        likes{
+        likes {
           id
         }
-        author{
+        author {
           name
         }
       }
-      likes{
+      likes {
         id
-        author{
+        author {
           name
         }
       }
@@ -193,7 +212,7 @@ const LIKE_COMMENT_MUTATION = gql`
 
 const DISLIKE_MUTATION = gql`
   mutation dislike($likeId: ID!) {
-    dislike( likeId: $likeId){
+    dislike(likeId: $likeId) {
       id
     }
   }
@@ -208,8 +227,8 @@ const PUBLISH_MUTATION = gql`
   }
 `
 const CREATE_COMMENT_MUTATION = gql`
-  mutation CreateCommentMutation($content: String! $postId: ID!) {
-    createComment(content: $content, postId: $postId ) {
+  mutation CreateCommentMutation($content: String!, $postId: ID!) {
+    createComment(content: $content, postId: $postId) {
       content
     }
   }
@@ -217,7 +236,7 @@ const CREATE_COMMENT_MUTATION = gql`
 
 const DELETE_COMMENT_MUTATION = gql`
   mutation deleteComment($commentId: ID!) {
-    deleteComment(commentId: $commentId){
+    deleteComment(commentId: $commentId) {
       id
     }
   }

@@ -10,8 +10,10 @@ type AtLeastOne<T, U = { [K in keyof T]: Pick<T, K> }> = Partial<T> &
   U[keyof U];
 
 export interface Exists {
+  chat: (where?: ChatWhereInput) => Promise<boolean>;
   comment: (where?: CommentWhereInput) => Promise<boolean>;
   like: (where?: LikeWhereInput) => Promise<boolean>;
+  message: (where?: MessageWhereInput) => Promise<boolean>;
   post: (where?: PostWhereInput) => Promise<boolean>;
   user: (where?: UserWhereInput) => Promise<boolean>;
 }
@@ -35,6 +37,29 @@ export interface Prisma {
    * Queries
    */
 
+  chat: (where: ChatWhereUniqueInput) => ChatPromise;
+  chats: (
+    args?: {
+      where?: ChatWhereInput;
+      orderBy?: ChatOrderByInput;
+      skip?: Int;
+      after?: String;
+      before?: String;
+      first?: Int;
+      last?: Int;
+    }
+  ) => FragmentableArray<Chat>;
+  chatsConnection: (
+    args?: {
+      where?: ChatWhereInput;
+      orderBy?: ChatOrderByInput;
+      skip?: Int;
+      after?: String;
+      before?: String;
+      first?: Int;
+      last?: Int;
+    }
+  ) => ChatConnectionPromise;
   comment: (where: CommentWhereUniqueInput) => CommentPromise;
   comments: (
     args?: {
@@ -81,6 +106,29 @@ export interface Prisma {
       last?: Int;
     }
   ) => LikeConnectionPromise;
+  message: (where: MessageWhereUniqueInput) => MessagePromise;
+  messages: (
+    args?: {
+      where?: MessageWhereInput;
+      orderBy?: MessageOrderByInput;
+      skip?: Int;
+      after?: String;
+      before?: String;
+      first?: Int;
+      last?: Int;
+    }
+  ) => FragmentableArray<Message>;
+  messagesConnection: (
+    args?: {
+      where?: MessageWhereInput;
+      orderBy?: MessageOrderByInput;
+      skip?: Int;
+      after?: String;
+      before?: String;
+      first?: Int;
+      last?: Int;
+    }
+  ) => MessageConnectionPromise;
   post: (where: PostWhereUniqueInput) => PostPromise;
   posts: (
     args?: {
@@ -133,6 +181,22 @@ export interface Prisma {
    * Mutations
    */
 
+  createChat: (data: ChatCreateInput) => ChatPromise;
+  updateChat: (
+    args: { data: ChatUpdateInput; where: ChatWhereUniqueInput }
+  ) => ChatPromise;
+  updateManyChats: (
+    args: { data: ChatUpdateManyMutationInput; where?: ChatWhereInput }
+  ) => BatchPayloadPromise;
+  upsertChat: (
+    args: {
+      where: ChatWhereUniqueInput;
+      create: ChatCreateInput;
+      update: ChatUpdateInput;
+    }
+  ) => ChatPromise;
+  deleteChat: (where: ChatWhereUniqueInput) => ChatPromise;
+  deleteManyChats: (where?: ChatWhereInput) => BatchPayloadPromise;
   createComment: (data: CommentCreateInput) => CommentPromise;
   updateComment: (
     args: { data: CommentUpdateInput; where: CommentWhereUniqueInput }
@@ -162,6 +226,22 @@ export interface Prisma {
   ) => LikePromise;
   deleteLike: (where: LikeWhereUniqueInput) => LikePromise;
   deleteManyLikes: (where?: LikeWhereInput) => BatchPayloadPromise;
+  createMessage: (data: MessageCreateInput) => MessagePromise;
+  updateMessage: (
+    args: { data: MessageUpdateInput; where: MessageWhereUniqueInput }
+  ) => MessagePromise;
+  updateManyMessages: (
+    args: { data: MessageUpdateManyMutationInput; where?: MessageWhereInput }
+  ) => BatchPayloadPromise;
+  upsertMessage: (
+    args: {
+      where: MessageWhereUniqueInput;
+      create: MessageCreateInput;
+      update: MessageUpdateInput;
+    }
+  ) => MessagePromise;
+  deleteMessage: (where: MessageWhereUniqueInput) => MessagePromise;
+  deleteManyMessages: (where?: MessageWhereInput) => BatchPayloadPromise;
   createPost: (data: PostCreateInput) => PostPromise;
   updatePost: (
     args: { data: PostUpdateInput; where: PostWhereUniqueInput }
@@ -203,12 +283,18 @@ export interface Prisma {
 }
 
 export interface Subscription {
+  chat: (
+    where?: ChatSubscriptionWhereInput
+  ) => ChatSubscriptionPayloadSubscription;
   comment: (
     where?: CommentSubscriptionWhereInput
   ) => CommentSubscriptionPayloadSubscription;
   like: (
     where?: LikeSubscriptionWhereInput
   ) => LikeSubscriptionPayloadSubscription;
+  message: (
+    where?: MessageSubscriptionWhereInput
+  ) => MessageSubscriptionPayloadSubscription;
   post: (
     where?: PostSubscriptionWhereInput
   ) => PostSubscriptionPayloadSubscription;
@@ -257,6 +343,26 @@ export type LikeOrderByInput =
   | "updatedAt_ASC"
   | "updatedAt_DESC";
 
+export type ChatOrderByInput =
+  | "id_ASC"
+  | "id_DESC"
+  | "createdAt_ASC"
+  | "createdAt_DESC"
+  | "updatedAt_ASC"
+  | "updatedAt_DESC"
+  | "name_ASC"
+  | "name_DESC";
+
+export type MessageOrderByInput =
+  | "id_ASC"
+  | "id_DESC"
+  | "createdAt_ASC"
+  | "createdAt_DESC"
+  | "updatedAt_ASC"
+  | "updatedAt_DESC"
+  | "content_ASC"
+  | "content_DESC";
+
 export type UserOrderByInput =
   | "id_ASC"
   | "id_DESC"
@@ -273,45 +379,76 @@ export type UserOrderByInput =
 
 export type MutationType = "CREATED" | "UPDATED" | "DELETED";
 
-export interface CommentUpdateWithWhereUniqueWithoutPostInput {
-  where: CommentWhereUniqueInput;
-  data: CommentUpdateWithoutPostDataInput;
+export interface UserUpdateWithoutPostsDataInput {
+  email?: String;
+  password?: String;
+  name?: String;
+  comments?: CommentUpdateManyWithoutAuthorInput;
+  likes?: LikeUpdateManyWithoutAuthorInput;
+  chats?: ChatUpdateManyWithoutUsersInput;
+  myChats?: ChatUpdateManyWithoutAuthorInput;
+  messages?: MessageUpdateManyWithoutAuthorInput;
 }
 
-export type CommentWhereUniqueInput = AtLeastOne<{
+export type ChatWhereUniqueInput = AtLeastOne<{
   id: ID_Input;
 }>;
 
-export interface PostCreateWithoutLikesInput {
+export interface PostUpdateOneRequiredWithoutCommentsInput {
+  create?: PostCreateWithoutCommentsInput;
+  update?: PostUpdateWithoutCommentsDataInput;
+  upsert?: PostUpsertWithoutCommentsInput;
+  connect?: PostWhereUniqueInput;
+}
+
+export interface CommentWhereInput {
+  id?: ID_Input;
+  id_not?: ID_Input;
+  id_in?: ID_Input[] | ID_Input;
+  id_not_in?: ID_Input[] | ID_Input;
+  id_lt?: ID_Input;
+  id_lte?: ID_Input;
+  id_gt?: ID_Input;
+  id_gte?: ID_Input;
+  id_contains?: ID_Input;
+  id_not_contains?: ID_Input;
+  id_starts_with?: ID_Input;
+  id_not_starts_with?: ID_Input;
+  id_ends_with?: ID_Input;
+  id_not_ends_with?: ID_Input;
+  author?: UserWhereInput;
+  content?: String;
+  content_not?: String;
+  content_in?: String[] | String;
+  content_not_in?: String[] | String;
+  content_lt?: String;
+  content_lte?: String;
+  content_gt?: String;
+  content_gte?: String;
+  content_contains?: String;
+  content_not_contains?: String;
+  content_starts_with?: String;
+  content_not_starts_with?: String;
+  content_ends_with?: String;
+  content_not_ends_with?: String;
+  post?: PostWhereInput;
+  likes_every?: LikeWhereInput;
+  likes_some?: LikeWhereInput;
+  likes_none?: LikeWhereInput;
+  AND?: CommentWhereInput[] | CommentWhereInput;
+  OR?: CommentWhereInput[] | CommentWhereInput;
+  NOT?: CommentWhereInput[] | CommentWhereInput;
+}
+
+export interface PostUpdateWithoutCommentsDataInput {
   published?: Boolean;
-  title: String;
-  content: String;
-  author: UserCreateOneWithoutPostsInput;
-  comments?: CommentCreateManyWithoutPostInput;
+  title?: String;
+  content?: String;
+  author?: UserUpdateOneRequiredWithoutPostsInput;
+  likes?: LikeUpdateManyWithoutPostInput;
 }
 
-export interface UserUpsertWithoutLikesInput {
-  update: UserUpdateWithoutLikesDataInput;
-  create: UserCreateWithoutLikesInput;
-}
-
-export interface CommentCreateOneWithoutLikesInput {
-  create?: CommentCreateWithoutLikesInput;
-  connect?: CommentWhereUniqueInput;
-}
-
-export interface LikeUpdateWithWhereUniqueWithoutCommentInput {
-  where: LikeWhereUniqueInput;
-  data: LikeUpdateWithoutCommentDataInput;
-}
-
-export interface CommentCreateWithoutLikesInput {
-  author: UserCreateOneWithoutCommentsInput;
-  content: String;
-  post: PostCreateOneWithoutCommentsInput;
-}
-
-export interface LikeWhereInput {
+export interface ChatWhereInput {
   id?: ID_Input;
   id_not?: ID_Input;
   id_in?: ID_Input[] | ID_Input;
@@ -334,204 +471,52 @@ export interface LikeWhereInput {
   createdAt_lte?: DateTimeInput;
   createdAt_gt?: DateTimeInput;
   createdAt_gte?: DateTimeInput;
+  updatedAt?: DateTimeInput;
+  updatedAt_not?: DateTimeInput;
+  updatedAt_in?: DateTimeInput[] | DateTimeInput;
+  updatedAt_not_in?: DateTimeInput[] | DateTimeInput;
+  updatedAt_lt?: DateTimeInput;
+  updatedAt_lte?: DateTimeInput;
+  updatedAt_gt?: DateTimeInput;
+  updatedAt_gte?: DateTimeInput;
+  name?: String;
+  name_not?: String;
+  name_in?: String[] | String;
+  name_not_in?: String[] | String;
+  name_lt?: String;
+  name_lte?: String;
+  name_gt?: String;
+  name_gte?: String;
+  name_contains?: String;
+  name_not_contains?: String;
+  name_starts_with?: String;
+  name_not_starts_with?: String;
+  name_ends_with?: String;
+  name_not_ends_with?: String;
   author?: UserWhereInput;
-  post?: PostWhereInput;
-  comment?: CommentWhereInput;
-  AND?: LikeWhereInput[] | LikeWhereInput;
-  OR?: LikeWhereInput[] | LikeWhereInput;
-  NOT?: LikeWhereInput[] | LikeWhereInput;
+  users_every?: UserWhereInput;
+  users_some?: UserWhereInput;
+  users_none?: UserWhereInput;
+  messages_every?: MessageWhereInput;
+  messages_some?: MessageWhereInput;
+  messages_none?: MessageWhereInput;
+  AND?: ChatWhereInput[] | ChatWhereInput;
+  OR?: ChatWhereInput[] | ChatWhereInput;
+  NOT?: ChatWhereInput[] | ChatWhereInput;
 }
 
-export interface LikeCreateManyWithoutPostInput {
+export interface LikeUpdateManyWithoutPostInput {
   create?: LikeCreateWithoutPostInput[] | LikeCreateWithoutPostInput;
-  connect?: LikeWhereUniqueInput[] | LikeWhereUniqueInput;
-}
-
-export interface UserSubscriptionWhereInput {
-  mutation_in?: MutationType[] | MutationType;
-  updatedFields_contains?: String;
-  updatedFields_contains_every?: String[] | String;
-  updatedFields_contains_some?: String[] | String;
-  node?: UserWhereInput;
-  AND?: UserSubscriptionWhereInput[] | UserSubscriptionWhereInput;
-  OR?: UserSubscriptionWhereInput[] | UserSubscriptionWhereInput;
-  NOT?: UserSubscriptionWhereInput[] | UserSubscriptionWhereInput;
-}
-
-export interface LikeCreateWithoutPostInput {
-  author: UserCreateOneWithoutLikesInput;
-  comment?: CommentCreateOneWithoutLikesInput;
-}
-
-export interface LikeSubscriptionWhereInput {
-  mutation_in?: MutationType[] | MutationType;
-  updatedFields_contains?: String;
-  updatedFields_contains_every?: String[] | String;
-  updatedFields_contains_some?: String[] | String;
-  node?: LikeWhereInput;
-  AND?: LikeSubscriptionWhereInput[] | LikeSubscriptionWhereInput;
-  OR?: LikeSubscriptionWhereInput[] | LikeSubscriptionWhereInput;
-  NOT?: LikeSubscriptionWhereInput[] | LikeSubscriptionWhereInput;
-}
-
-export interface CommentUpdateInput {
-  author?: UserUpdateOneRequiredWithoutCommentsInput;
-  content?: String;
-  post?: PostUpdateOneRequiredWithoutCommentsInput;
-  likes?: LikeUpdateManyWithoutCommentInput;
-}
-
-export interface UserUpdateManyMutationInput {
-  email?: String;
-  password?: String;
-  name?: String;
-}
-
-export interface UserUpdateOneRequiredWithoutCommentsInput {
-  create?: UserCreateWithoutCommentsInput;
-  update?: UserUpdateWithoutCommentsDataInput;
-  upsert?: UserUpsertWithoutCommentsInput;
-  connect?: UserWhereUniqueInput;
-}
-
-export interface UserCreateInput {
-  email: String;
-  password: String;
-  name: String;
-  posts?: PostCreateManyWithoutAuthorInput;
-  comments?: CommentCreateManyWithoutAuthorInput;
-  likes?: LikeCreateManyWithoutAuthorInput;
-}
-
-export interface UserUpdateWithoutCommentsDataInput {
-  email?: String;
-  password?: String;
-  name?: String;
-  posts?: PostUpdateManyWithoutAuthorInput;
-  likes?: LikeUpdateManyWithoutAuthorInput;
-}
-
-export interface PostUpdateInput {
-  published?: Boolean;
-  title?: String;
-  content?: String;
-  author?: UserUpdateOneRequiredWithoutPostsInput;
-  comments?: CommentUpdateManyWithoutPostInput;
-  likes?: LikeUpdateManyWithoutPostInput;
-}
-
-export interface PostUpdateManyWithoutAuthorInput {
-  create?: PostCreateWithoutAuthorInput[] | PostCreateWithoutAuthorInput;
-  delete?: PostWhereUniqueInput[] | PostWhereUniqueInput;
-  connect?: PostWhereUniqueInput[] | PostWhereUniqueInput;
-  disconnect?: PostWhereUniqueInput[] | PostWhereUniqueInput;
-  update?:
-    | PostUpdateWithWhereUniqueWithoutAuthorInput[]
-    | PostUpdateWithWhereUniqueWithoutAuthorInput;
-  upsert?:
-    | PostUpsertWithWhereUniqueWithoutAuthorInput[]
-    | PostUpsertWithWhereUniqueWithoutAuthorInput;
-  deleteMany?: PostScalarWhereInput[] | PostScalarWhereInput;
-  updateMany?:
-    | PostUpdateManyWithWhereNestedInput[]
-    | PostUpdateManyWithWhereNestedInput;
-}
-
-export interface PostCreateInput {
-  published?: Boolean;
-  title: String;
-  content: String;
-  author: UserCreateOneWithoutPostsInput;
-  comments?: CommentCreateManyWithoutPostInput;
-  likes?: LikeCreateManyWithoutPostInput;
-}
-
-export interface PostUpdateWithWhereUniqueWithoutAuthorInput {
-  where: PostWhereUniqueInput;
-  data: PostUpdateWithoutAuthorDataInput;
-}
-
-export interface LikeCreateInput {
-  author: UserCreateOneWithoutLikesInput;
-  post?: PostCreateOneWithoutLikesInput;
-  comment?: CommentCreateOneWithoutLikesInput;
-}
-
-export interface PostUpdateWithoutAuthorDataInput {
-  published?: Boolean;
-  title?: String;
-  content?: String;
-  comments?: CommentUpdateManyWithoutPostInput;
-  likes?: LikeUpdateManyWithoutPostInput;
-}
-
-export interface CommentUpdateManyMutationInput {
-  content?: String;
-}
-
-export interface CommentUpdateManyWithoutPostInput {
-  create?: CommentCreateWithoutPostInput[] | CommentCreateWithoutPostInput;
-  delete?: CommentWhereUniqueInput[] | CommentWhereUniqueInput;
-  connect?: CommentWhereUniqueInput[] | CommentWhereUniqueInput;
-  disconnect?: CommentWhereUniqueInput[] | CommentWhereUniqueInput;
-  update?:
-    | CommentUpdateWithWhereUniqueWithoutPostInput[]
-    | CommentUpdateWithWhereUniqueWithoutPostInput;
-  upsert?:
-    | CommentUpsertWithWhereUniqueWithoutPostInput[]
-    | CommentUpsertWithWhereUniqueWithoutPostInput;
-  deleteMany?: CommentScalarWhereInput[] | CommentScalarWhereInput;
-  updateMany?:
-    | CommentUpdateManyWithWhereNestedInput[]
-    | CommentUpdateManyWithWhereNestedInput;
-}
-
-export interface PostUpdateManyDataInput {
-  published?: Boolean;
-  title?: String;
-  content?: String;
-}
-
-export interface LikeUpsertWithWhereUniqueWithoutCommentInput {
-  where: LikeWhereUniqueInput;
-  update: LikeUpdateWithoutCommentDataInput;
-  create: LikeCreateWithoutCommentInput;
-}
-
-export interface PostUpdateManyWithWhereNestedInput {
-  where: PostScalarWhereInput;
-  data: PostUpdateManyDataInput;
-}
-
-export interface CommentUpdateWithoutPostDataInput {
-  author?: UserUpdateOneRequiredWithoutCommentsInput;
-  content?: String;
-  likes?: LikeUpdateManyWithoutCommentInput;
-}
-
-export interface PostUpsertWithWhereUniqueWithoutAuthorInput {
-  where: PostWhereUniqueInput;
-  update: PostUpdateWithoutAuthorDataInput;
-  create: PostCreateWithoutAuthorInput;
-}
-
-export interface LikeUpdateManyWithoutCommentInput {
-  create?: LikeCreateWithoutCommentInput[] | LikeCreateWithoutCommentInput;
   delete?: LikeWhereUniqueInput[] | LikeWhereUniqueInput;
   connect?: LikeWhereUniqueInput[] | LikeWhereUniqueInput;
   disconnect?: LikeWhereUniqueInput[] | LikeWhereUniqueInput;
   update?:
-    | LikeUpdateWithWhereUniqueWithoutCommentInput[]
-    | LikeUpdateWithWhereUniqueWithoutCommentInput;
+    | LikeUpdateWithWhereUniqueWithoutPostInput[]
+    | LikeUpdateWithWhereUniqueWithoutPostInput;
   upsert?:
-    | LikeUpsertWithWhereUniqueWithoutCommentInput[]
-    | LikeUpsertWithWhereUniqueWithoutCommentInput;
+    | LikeUpsertWithWhereUniqueWithoutPostInput[]
+    | LikeUpsertWithWhereUniqueWithoutPostInput;
   deleteMany?: LikeScalarWhereInput[] | LikeScalarWhereInput;
-}
-
-export interface UserCreateOneWithoutCommentsInput {
-  create?: UserCreateWithoutCommentsInput;
-  connect?: UserWhereUniqueInput;
 }
 
 export interface UserWhereInput {
@@ -608,124 +593,59 @@ export interface UserWhereInput {
   likes_every?: LikeWhereInput;
   likes_some?: LikeWhereInput;
   likes_none?: LikeWhereInput;
+  chats_every?: ChatWhereInput;
+  chats_some?: ChatWhereInput;
+  chats_none?: ChatWhereInput;
+  myChats_every?: ChatWhereInput;
+  myChats_some?: ChatWhereInput;
+  myChats_none?: ChatWhereInput;
+  messages_every?: MessageWhereInput;
+  messages_some?: MessageWhereInput;
+  messages_none?: MessageWhereInput;
   AND?: UserWhereInput[] | UserWhereInput;
   OR?: UserWhereInput[] | UserWhereInput;
   NOT?: UserWhereInput[] | UserWhereInput;
 }
 
-export interface PostCreateManyWithoutAuthorInput {
+export interface PostUpdateManyWithoutAuthorInput {
   create?: PostCreateWithoutAuthorInput[] | PostCreateWithoutAuthorInput;
+  delete?: PostWhereUniqueInput[] | PostWhereUniqueInput;
   connect?: PostWhereUniqueInput[] | PostWhereUniqueInput;
-}
-
-export interface LikeUpdateWithoutCommentDataInput {
-  author?: UserUpdateOneRequiredWithoutLikesInput;
-  post?: PostUpdateOneWithoutLikesInput;
-}
-
-export interface CommentCreateManyWithoutPostInput {
-  create?: CommentCreateWithoutPostInput[] | CommentCreateWithoutPostInput;
-  connect?: CommentWhereUniqueInput[] | CommentWhereUniqueInput;
-}
-
-export interface UserUpdateOneRequiredWithoutLikesInput {
-  create?: UserCreateWithoutLikesInput;
-  update?: UserUpdateWithoutLikesDataInput;
-  upsert?: UserUpsertWithoutLikesInput;
-  connect?: UserWhereUniqueInput;
-}
-
-export interface LikeCreateManyWithoutCommentInput {
-  create?: LikeCreateWithoutCommentInput[] | LikeCreateWithoutCommentInput;
-  connect?: LikeWhereUniqueInput[] | LikeWhereUniqueInput;
-}
-
-export interface UserUpdateWithoutLikesDataInput {
-  email?: String;
-  password?: String;
-  name?: String;
-  posts?: PostUpdateManyWithoutAuthorInput;
-  comments?: CommentUpdateManyWithoutAuthorInput;
-}
-
-export interface UserCreateOneWithoutLikesInput {
-  create?: UserCreateWithoutLikesInput;
-  connect?: UserWhereUniqueInput;
-}
-
-export interface CommentUpdateManyWithoutAuthorInput {
-  create?: CommentCreateWithoutAuthorInput[] | CommentCreateWithoutAuthorInput;
-  delete?: CommentWhereUniqueInput[] | CommentWhereUniqueInput;
-  connect?: CommentWhereUniqueInput[] | CommentWhereUniqueInput;
-  disconnect?: CommentWhereUniqueInput[] | CommentWhereUniqueInput;
+  disconnect?: PostWhereUniqueInput[] | PostWhereUniqueInput;
   update?:
-    | CommentUpdateWithWhereUniqueWithoutAuthorInput[]
-    | CommentUpdateWithWhereUniqueWithoutAuthorInput;
+    | PostUpdateWithWhereUniqueWithoutAuthorInput[]
+    | PostUpdateWithWhereUniqueWithoutAuthorInput;
   upsert?:
-    | CommentUpsertWithWhereUniqueWithoutAuthorInput[]
-    | CommentUpsertWithWhereUniqueWithoutAuthorInput;
-  deleteMany?: CommentScalarWhereInput[] | CommentScalarWhereInput;
+    | PostUpsertWithWhereUniqueWithoutAuthorInput[]
+    | PostUpsertWithWhereUniqueWithoutAuthorInput;
+  deleteMany?: PostScalarWhereInput[] | PostScalarWhereInput;
   updateMany?:
-    | CommentUpdateManyWithWhereNestedInput[]
-    | CommentUpdateManyWithWhereNestedInput;
+    | PostUpdateManyWithWhereNestedInput[]
+    | PostUpdateManyWithWhereNestedInput;
 }
 
-export interface CommentCreateManyWithoutAuthorInput {
-  create?: CommentCreateWithoutAuthorInput[] | CommentCreateWithoutAuthorInput;
-  connect?: CommentWhereUniqueInput[] | CommentWhereUniqueInput;
+export interface LikeUpsertWithWhereUniqueWithoutAuthorInput {
+  where: LikeWhereUniqueInput;
+  update: LikeUpdateWithoutAuthorDataInput;
+  create: LikeCreateWithoutAuthorInput;
 }
 
-export interface CommentUpdateWithWhereUniqueWithoutAuthorInput {
-  where: CommentWhereUniqueInput;
-  data: CommentUpdateWithoutAuthorDataInput;
+export interface PostUpdateWithWhereUniqueWithoutAuthorInput {
+  where: PostWhereUniqueInput;
+  data: PostUpdateWithoutAuthorDataInput;
 }
 
-export interface PostCreateOneWithoutCommentsInput {
-  create?: PostCreateWithoutCommentsInput;
-  connect?: PostWhereUniqueInput;
+export interface LikeUpdateWithWhereUniqueWithoutPostInput {
+  where: LikeWhereUniqueInput;
+  data: LikeUpdateWithoutPostDataInput;
 }
 
-export interface CommentUpdateWithoutAuthorDataInput {
-  content?: String;
-  post?: PostUpdateOneRequiredWithoutCommentsInput;
-  likes?: LikeUpdateManyWithoutCommentInput;
-}
-
-export interface UserCreateOneWithoutPostsInput {
-  create?: UserCreateWithoutPostsInput;
-  connect?: UserWhereUniqueInput;
-}
-
-export interface PostUpdateOneRequiredWithoutCommentsInput {
-  create?: PostCreateWithoutCommentsInput;
-  update?: PostUpdateWithoutCommentsDataInput;
-  upsert?: PostUpsertWithoutCommentsInput;
-  connect?: PostWhereUniqueInput;
-}
-
-export interface LikeCreateManyWithoutAuthorInput {
-  create?: LikeCreateWithoutAuthorInput[] | LikeCreateWithoutAuthorInput;
-  connect?: LikeWhereUniqueInput[] | LikeWhereUniqueInput;
-}
-
-export interface PostUpdateWithoutCommentsDataInput {
+export interface PostUpdateWithoutAuthorDataInput {
   published?: Boolean;
   title?: String;
   content?: String;
-  author?: UserUpdateOneRequiredWithoutPostsInput;
+  comments?: CommentUpdateManyWithoutPostInput;
   likes?: LikeUpdateManyWithoutPostInput;
-}
-
-export interface PostCreateOneWithoutLikesInput {
-  create?: PostCreateWithoutLikesInput;
-  connect?: PostWhereUniqueInput;
-}
-
-export interface UserUpdateOneRequiredWithoutPostsInput {
-  create?: UserCreateWithoutPostsInput;
-  update?: UserUpdateWithoutPostsDataInput;
-  upsert?: UserUpsertWithoutPostsInput;
-  connect?: UserWhereUniqueInput;
 }
 
 export interface PostWhereInput {
@@ -801,12 +721,37 @@ export interface PostWhereInput {
   NOT?: PostWhereInput[] | PostWhereInput;
 }
 
-export interface UserUpdateWithoutPostsDataInput {
-  email?: String;
-  password?: String;
-  name?: String;
-  comments?: CommentUpdateManyWithoutAuthorInput;
-  likes?: LikeUpdateManyWithoutAuthorInput;
+export interface CommentUpdateManyWithoutPostInput {
+  create?: CommentCreateWithoutPostInput[] | CommentCreateWithoutPostInput;
+  delete?: CommentWhereUniqueInput[] | CommentWhereUniqueInput;
+  connect?: CommentWhereUniqueInput[] | CommentWhereUniqueInput;
+  disconnect?: CommentWhereUniqueInput[] | CommentWhereUniqueInput;
+  update?:
+    | CommentUpdateWithWhereUniqueWithoutPostInput[]
+    | CommentUpdateWithWhereUniqueWithoutPostInput;
+  upsert?:
+    | CommentUpsertWithWhereUniqueWithoutPostInput[]
+    | CommentUpsertWithWhereUniqueWithoutPostInput;
+  deleteMany?: CommentScalarWhereInput[] | CommentScalarWhereInput;
+  updateMany?:
+    | CommentUpdateManyWithWhereNestedInput[]
+    | CommentUpdateManyWithWhereNestedInput;
+}
+
+export interface MessageSubscriptionWhereInput {
+  mutation_in?: MutationType[] | MutationType;
+  updatedFields_contains?: String;
+  updatedFields_contains_every?: String[] | String;
+  updatedFields_contains_some?: String[] | String;
+  node?: MessageWhereInput;
+  AND?: MessageSubscriptionWhereInput[] | MessageSubscriptionWhereInput;
+  OR?: MessageSubscriptionWhereInput[] | MessageSubscriptionWhereInput;
+  NOT?: MessageSubscriptionWhereInput[] | MessageSubscriptionWhereInput;
+}
+
+export interface CommentUpdateWithWhereUniqueWithoutPostInput {
+  where: CommentWhereUniqueInput;
+  data: CommentUpdateWithoutPostDataInput;
 }
 
 export interface CommentSubscriptionWhereInput {
@@ -819,6 +764,52 @@ export interface CommentSubscriptionWhereInput {
   OR?: CommentSubscriptionWhereInput[] | CommentSubscriptionWhereInput;
   NOT?: CommentSubscriptionWhereInput[] | CommentSubscriptionWhereInput;
 }
+
+export interface CommentUpdateWithoutPostDataInput {
+  author?: UserUpdateOneRequiredWithoutCommentsInput;
+  content?: String;
+  likes?: LikeUpdateManyWithoutCommentInput;
+}
+
+export interface UserUpdateManyMutationInput {
+  email?: String;
+  password?: String;
+  name?: String;
+}
+
+export interface UserUpdateOneRequiredWithoutCommentsInput {
+  create?: UserCreateWithoutCommentsInput;
+  update?: UserUpdateWithoutCommentsDataInput;
+  upsert?: UserUpsertWithoutCommentsInput;
+  connect?: UserWhereUniqueInput;
+}
+
+export interface UserCreateInput {
+  email: String;
+  password: String;
+  name: String;
+  posts?: PostCreateManyWithoutAuthorInput;
+  comments?: CommentCreateManyWithoutAuthorInput;
+  likes?: LikeCreateManyWithoutAuthorInput;
+  chats?: ChatCreateManyWithoutUsersInput;
+  myChats?: ChatCreateManyWithoutAuthorInput;
+  messages?: MessageCreateManyWithoutAuthorInput;
+}
+
+export interface UserUpdateWithoutCommentsDataInput {
+  email?: String;
+  password?: String;
+  name?: String;
+  posts?: PostUpdateManyWithoutAuthorInput;
+  likes?: LikeUpdateManyWithoutAuthorInput;
+  chats?: ChatUpdateManyWithoutUsersInput;
+  myChats?: ChatUpdateManyWithoutAuthorInput;
+  messages?: MessageUpdateManyWithoutAuthorInput;
+}
+
+export type CommentWhereUniqueInput = AtLeastOne<{
+  id: ID_Input;
+}>;
 
 export interface LikeUpdateManyWithoutAuthorInput {
   create?: LikeCreateWithoutAuthorInput[] | LikeCreateWithoutAuthorInput;
@@ -834,10 +825,13 @@ export interface LikeUpdateManyWithoutAuthorInput {
   deleteMany?: LikeScalarWhereInput[] | LikeScalarWhereInput;
 }
 
-export interface PostUpdateManyMutationInput {
+export interface PostCreateInput {
   published?: Boolean;
-  title?: String;
-  content?: String;
+  title: String;
+  content: String;
+  author: UserCreateOneWithoutPostsInput;
+  comments?: CommentCreateManyWithoutPostInput;
+  likes?: LikeCreateManyWithoutPostInput;
 }
 
 export interface LikeUpdateWithWhereUniqueWithoutAuthorInput {
@@ -845,20 +839,19 @@ export interface LikeUpdateWithWhereUniqueWithoutAuthorInput {
   data: LikeUpdateWithoutAuthorDataInput;
 }
 
-export interface LikeUpdateInput {
-  author?: UserUpdateOneRequiredWithoutLikesInput;
-  post?: PostUpdateOneWithoutLikesInput;
-  comment?: CommentUpdateOneWithoutLikesInput;
-}
+export type LikeWhereUniqueInput = AtLeastOne<{
+  id: ID_Input;
+}>;
 
 export interface LikeUpdateWithoutAuthorDataInput {
   post?: PostUpdateOneWithoutLikesInput;
   comment?: CommentUpdateOneWithoutLikesInput;
 }
 
-export interface UserUpsertWithoutCommentsInput {
-  update: UserUpdateWithoutCommentsDataInput;
-  create: UserCreateWithoutCommentsInput;
+export interface MessageCreateInput {
+  chat: ChatCreateOneWithoutMessagesInput;
+  author: UserCreateOneWithoutMessagesInput;
+  content: String;
 }
 
 export interface PostUpdateOneWithoutLikesInput {
@@ -868,6 +861,601 @@ export interface PostUpdateOneWithoutLikesInput {
   delete?: Boolean;
   disconnect?: Boolean;
   connect?: PostWhereUniqueInput;
+}
+
+export type MessageWhereUniqueInput = AtLeastOne<{
+  id: ID_Input;
+}>;
+
+export interface PostUpdateWithoutLikesDataInput {
+  published?: Boolean;
+  title?: String;
+  content?: String;
+  author?: UserUpdateOneRequiredWithoutPostsInput;
+  comments?: CommentUpdateManyWithoutPostInput;
+}
+
+export interface CommentUpdateManyMutationInput {
+  content?: String;
+}
+
+export interface UserUpdateOneRequiredWithoutPostsInput {
+  create?: UserCreateWithoutPostsInput;
+  update?: UserUpdateWithoutPostsDataInput;
+  upsert?: UserUpsertWithoutPostsInput;
+  connect?: UserWhereUniqueInput;
+}
+
+export type PostWhereUniqueInput = AtLeastOne<{
+  id: ID_Input;
+}>;
+
+export interface PostUpsertWithWhereUniqueWithoutAuthorInput {
+  where: PostWhereUniqueInput;
+  update: PostUpdateWithoutAuthorDataInput;
+  create: PostCreateWithoutAuthorInput;
+}
+
+export interface ChatUpdateManyMutationInput {
+  name?: String;
+}
+
+export interface CommentUpdateManyWithoutAuthorInput {
+  create?: CommentCreateWithoutAuthorInput[] | CommentCreateWithoutAuthorInput;
+  delete?: CommentWhereUniqueInput[] | CommentWhereUniqueInput;
+  connect?: CommentWhereUniqueInput[] | CommentWhereUniqueInput;
+  disconnect?: CommentWhereUniqueInput[] | CommentWhereUniqueInput;
+  update?:
+    | CommentUpdateWithWhereUniqueWithoutAuthorInput[]
+    | CommentUpdateWithWhereUniqueWithoutAuthorInput;
+  upsert?:
+    | CommentUpsertWithWhereUniqueWithoutAuthorInput[]
+    | CommentUpsertWithWhereUniqueWithoutAuthorInput;
+  deleteMany?: CommentScalarWhereInput[] | CommentScalarWhereInput;
+  updateMany?:
+    | CommentUpdateManyWithWhereNestedInput[]
+    | CommentUpdateManyWithWhereNestedInput;
+}
+
+export type UserWhereUniqueInput = AtLeastOne<{
+  id: ID_Input;
+  email?: String;
+}>;
+
+export interface CommentUpdateWithWhereUniqueWithoutAuthorInput {
+  where: CommentWhereUniqueInput;
+  data: CommentUpdateWithoutAuthorDataInput;
+}
+
+export interface PostUpdateManyWithWhereNestedInput {
+  where: PostScalarWhereInput;
+  data: PostUpdateManyDataInput;
+}
+
+export interface CommentUpdateWithoutAuthorDataInput {
+  content?: String;
+  post?: PostUpdateOneRequiredWithoutCommentsInput;
+  likes?: LikeUpdateManyWithoutCommentInput;
+}
+
+export interface UserCreateOneWithoutMyChatsInput {
+  create?: UserCreateWithoutMyChatsInput;
+  connect?: UserWhereUniqueInput;
+}
+
+export interface LikeWhereInput {
+  id?: ID_Input;
+  id_not?: ID_Input;
+  id_in?: ID_Input[] | ID_Input;
+  id_not_in?: ID_Input[] | ID_Input;
+  id_lt?: ID_Input;
+  id_lte?: ID_Input;
+  id_gt?: ID_Input;
+  id_gte?: ID_Input;
+  id_contains?: ID_Input;
+  id_not_contains?: ID_Input;
+  id_starts_with?: ID_Input;
+  id_not_starts_with?: ID_Input;
+  id_ends_with?: ID_Input;
+  id_not_ends_with?: ID_Input;
+  createdAt?: DateTimeInput;
+  createdAt_not?: DateTimeInput;
+  createdAt_in?: DateTimeInput[] | DateTimeInput;
+  createdAt_not_in?: DateTimeInput[] | DateTimeInput;
+  createdAt_lt?: DateTimeInput;
+  createdAt_lte?: DateTimeInput;
+  createdAt_gt?: DateTimeInput;
+  createdAt_gte?: DateTimeInput;
+  author?: UserWhereInput;
+  post?: PostWhereInput;
+  comment?: CommentWhereInput;
+  AND?: LikeWhereInput[] | LikeWhereInput;
+  OR?: LikeWhereInput[] | LikeWhereInput;
+  NOT?: LikeWhereInput[] | LikeWhereInput;
+}
+
+export interface PostCreateManyWithoutAuthorInput {
+  create?: PostCreateWithoutAuthorInput[] | PostCreateWithoutAuthorInput;
+  connect?: PostWhereUniqueInput[] | PostWhereUniqueInput;
+}
+
+export interface MessageWhereInput {
+  id?: ID_Input;
+  id_not?: ID_Input;
+  id_in?: ID_Input[] | ID_Input;
+  id_not_in?: ID_Input[] | ID_Input;
+  id_lt?: ID_Input;
+  id_lte?: ID_Input;
+  id_gt?: ID_Input;
+  id_gte?: ID_Input;
+  id_contains?: ID_Input;
+  id_not_contains?: ID_Input;
+  id_starts_with?: ID_Input;
+  id_not_starts_with?: ID_Input;
+  id_ends_with?: ID_Input;
+  id_not_ends_with?: ID_Input;
+  createdAt?: DateTimeInput;
+  createdAt_not?: DateTimeInput;
+  createdAt_in?: DateTimeInput[] | DateTimeInput;
+  createdAt_not_in?: DateTimeInput[] | DateTimeInput;
+  createdAt_lt?: DateTimeInput;
+  createdAt_lte?: DateTimeInput;
+  createdAt_gt?: DateTimeInput;
+  createdAt_gte?: DateTimeInput;
+  updatedAt?: DateTimeInput;
+  updatedAt_not?: DateTimeInput;
+  updatedAt_in?: DateTimeInput[] | DateTimeInput;
+  updatedAt_not_in?: DateTimeInput[] | DateTimeInput;
+  updatedAt_lt?: DateTimeInput;
+  updatedAt_lte?: DateTimeInput;
+  updatedAt_gt?: DateTimeInput;
+  updatedAt_gte?: DateTimeInput;
+  chat?: ChatWhereInput;
+  author?: UserWhereInput;
+  content?: String;
+  content_not?: String;
+  content_in?: String[] | String;
+  content_not_in?: String[] | String;
+  content_lt?: String;
+  content_lte?: String;
+  content_gt?: String;
+  content_gte?: String;
+  content_contains?: String;
+  content_not_contains?: String;
+  content_starts_with?: String;
+  content_not_starts_with?: String;
+  content_ends_with?: String;
+  content_not_ends_with?: String;
+  AND?: MessageWhereInput[] | MessageWhereInput;
+  OR?: MessageWhereInput[] | MessageWhereInput;
+  NOT?: MessageWhereInput[] | MessageWhereInput;
+}
+
+export interface CommentCreateManyWithoutPostInput {
+  create?: CommentCreateWithoutPostInput[] | CommentCreateWithoutPostInput;
+  connect?: CommentWhereUniqueInput[] | CommentWhereUniqueInput;
+}
+
+export interface CommentUpsertWithWhereUniqueWithoutPostInput {
+  where: CommentWhereUniqueInput;
+  update: CommentUpdateWithoutPostDataInput;
+  create: CommentCreateWithoutPostInput;
+}
+
+export interface UserCreateOneWithoutCommentsInput {
+  create?: UserCreateWithoutCommentsInput;
+  connect?: UserWhereUniqueInput;
+}
+
+export interface UserUpsertWithoutCommentsInput {
+  update: UserUpdateWithoutCommentsDataInput;
+  create: UserCreateWithoutCommentsInput;
+}
+
+export interface LikeCreateManyWithoutAuthorInput {
+  create?: LikeCreateWithoutAuthorInput[] | LikeCreateWithoutAuthorInput;
+  connect?: LikeWhereUniqueInput[] | LikeWhereUniqueInput;
+}
+
+export interface LikeUpdateWithoutPostDataInput {
+  author?: UserUpdateOneRequiredWithoutLikesInput;
+  comment?: CommentUpdateOneWithoutLikesInput;
+}
+
+export interface PostCreateOneWithoutLikesInput {
+  create?: PostCreateWithoutLikesInput;
+  connect?: PostWhereUniqueInput;
+}
+
+export interface UserUpdateOneRequiredWithoutLikesInput {
+  create?: UserCreateWithoutLikesInput;
+  update?: UserUpdateWithoutLikesDataInput;
+  upsert?: UserUpsertWithoutLikesInput;
+  connect?: UserWhereUniqueInput;
+}
+
+export interface UserCreateOneWithoutPostsInput {
+  create?: UserCreateWithoutPostsInput;
+  connect?: UserWhereUniqueInput;
+}
+
+export interface UserUpdateWithoutLikesDataInput {
+  email?: String;
+  password?: String;
+  name?: String;
+  posts?: PostUpdateManyWithoutAuthorInput;
+  comments?: CommentUpdateManyWithoutAuthorInput;
+  chats?: ChatUpdateManyWithoutUsersInput;
+  myChats?: ChatUpdateManyWithoutAuthorInput;
+  messages?: MessageUpdateManyWithoutAuthorInput;
+}
+
+export interface CommentCreateManyWithoutAuthorInput {
+  create?: CommentCreateWithoutAuthorInput[] | CommentCreateWithoutAuthorInput;
+  connect?: CommentWhereUniqueInput[] | CommentWhereUniqueInput;
+}
+
+export interface ChatUpdateManyWithoutUsersInput {
+  create?: ChatCreateWithoutUsersInput[] | ChatCreateWithoutUsersInput;
+  delete?: ChatWhereUniqueInput[] | ChatWhereUniqueInput;
+  connect?: ChatWhereUniqueInput[] | ChatWhereUniqueInput;
+  disconnect?: ChatWhereUniqueInput[] | ChatWhereUniqueInput;
+  update?:
+    | ChatUpdateWithWhereUniqueWithoutUsersInput[]
+    | ChatUpdateWithWhereUniqueWithoutUsersInput;
+  upsert?:
+    | ChatUpsertWithWhereUniqueWithoutUsersInput[]
+    | ChatUpsertWithWhereUniqueWithoutUsersInput;
+  deleteMany?: ChatScalarWhereInput[] | ChatScalarWhereInput;
+  updateMany?:
+    | ChatUpdateManyWithWhereNestedInput[]
+    | ChatUpdateManyWithWhereNestedInput;
+}
+
+export interface PostCreateOneWithoutCommentsInput {
+  create?: PostCreateWithoutCommentsInput;
+  connect?: PostWhereUniqueInput;
+}
+
+export interface ChatUpdateWithWhereUniqueWithoutUsersInput {
+  where: ChatWhereUniqueInput;
+  data: ChatUpdateWithoutUsersDataInput;
+}
+
+export interface LikeCreateManyWithoutPostInput {
+  create?: LikeCreateWithoutPostInput[] | LikeCreateWithoutPostInput;
+  connect?: LikeWhereUniqueInput[] | LikeWhereUniqueInput;
+}
+
+export interface ChatUpdateWithoutUsersDataInput {
+  name?: String;
+  author?: UserUpdateOneRequiredWithoutMyChatsInput;
+  messages?: MessageUpdateManyWithoutChatInput;
+}
+
+export interface UserCreateOneWithoutLikesInput {
+  create?: UserCreateWithoutLikesInput;
+  connect?: UserWhereUniqueInput;
+}
+
+export interface MessageUpdateManyWithoutChatInput {
+  create?: MessageCreateWithoutChatInput[] | MessageCreateWithoutChatInput;
+  delete?: MessageWhereUniqueInput[] | MessageWhereUniqueInput;
+  connect?: MessageWhereUniqueInput[] | MessageWhereUniqueInput;
+  disconnect?: MessageWhereUniqueInput[] | MessageWhereUniqueInput;
+  update?:
+    | MessageUpdateWithWhereUniqueWithoutChatInput[]
+    | MessageUpdateWithWhereUniqueWithoutChatInput;
+  upsert?:
+    | MessageUpsertWithWhereUniqueWithoutChatInput[]
+    | MessageUpsertWithWhereUniqueWithoutChatInput;
+  deleteMany?: MessageScalarWhereInput[] | MessageScalarWhereInput;
+  updateMany?:
+    | MessageUpdateManyWithWhereNestedInput[]
+    | MessageUpdateManyWithWhereNestedInput;
+}
+
+export interface ChatCreateManyWithoutUsersInput {
+  create?: ChatCreateWithoutUsersInput[] | ChatCreateWithoutUsersInput;
+  connect?: ChatWhereUniqueInput[] | ChatWhereUniqueInput;
+}
+
+export interface MessageUpdateWithWhereUniqueWithoutChatInput {
+  where: MessageWhereUniqueInput;
+  data: MessageUpdateWithoutChatDataInput;
+}
+
+export interface MessageCreateManyWithoutChatInput {
+  create?: MessageCreateWithoutChatInput[] | MessageCreateWithoutChatInput;
+  connect?: MessageWhereUniqueInput[] | MessageWhereUniqueInput;
+}
+
+export interface MessageUpdateWithoutChatDataInput {
+  author?: UserUpdateOneRequiredWithoutMessagesInput;
+  content?: String;
+}
+
+export interface UserCreateOneWithoutMessagesInput {
+  create?: UserCreateWithoutMessagesInput;
+  connect?: UserWhereUniqueInput;
+}
+
+export interface UserUpdateOneRequiredWithoutMessagesInput {
+  create?: UserCreateWithoutMessagesInput;
+  update?: UserUpdateWithoutMessagesDataInput;
+  upsert?: UserUpsertWithoutMessagesInput;
+  connect?: UserWhereUniqueInput;
+}
+
+export interface ChatCreateManyWithoutAuthorInput {
+  create?: ChatCreateWithoutAuthorInput[] | ChatCreateWithoutAuthorInput;
+  connect?: ChatWhereUniqueInput[] | ChatWhereUniqueInput;
+}
+
+export interface UserUpdateWithoutMessagesDataInput {
+  email?: String;
+  password?: String;
+  name?: String;
+  posts?: PostUpdateManyWithoutAuthorInput;
+  comments?: CommentUpdateManyWithoutAuthorInput;
+  likes?: LikeUpdateManyWithoutAuthorInput;
+  chats?: ChatUpdateManyWithoutUsersInput;
+  myChats?: ChatUpdateManyWithoutAuthorInput;
+}
+
+export interface UserCreateManyWithoutChatsInput {
+  create?: UserCreateWithoutChatsInput[] | UserCreateWithoutChatsInput;
+  connect?: UserWhereUniqueInput[] | UserWhereUniqueInput;
+}
+
+export interface ChatUpdateManyWithoutAuthorInput {
+  create?: ChatCreateWithoutAuthorInput[] | ChatCreateWithoutAuthorInput;
+  delete?: ChatWhereUniqueInput[] | ChatWhereUniqueInput;
+  connect?: ChatWhereUniqueInput[] | ChatWhereUniqueInput;
+  disconnect?: ChatWhereUniqueInput[] | ChatWhereUniqueInput;
+  update?:
+    | ChatUpdateWithWhereUniqueWithoutAuthorInput[]
+    | ChatUpdateWithWhereUniqueWithoutAuthorInput;
+  upsert?:
+    | ChatUpsertWithWhereUniqueWithoutAuthorInput[]
+    | ChatUpsertWithWhereUniqueWithoutAuthorInput;
+  deleteMany?: ChatScalarWhereInput[] | ChatScalarWhereInput;
+  updateMany?:
+    | ChatUpdateManyWithWhereNestedInput[]
+    | ChatUpdateManyWithWhereNestedInput;
+}
+
+export interface MessageCreateManyWithoutAuthorInput {
+  create?: MessageCreateWithoutAuthorInput[] | MessageCreateWithoutAuthorInput;
+  connect?: MessageWhereUniqueInput[] | MessageWhereUniqueInput;
+}
+
+export interface ChatUpdateWithWhereUniqueWithoutAuthorInput {
+  where: ChatWhereUniqueInput;
+  data: ChatUpdateWithoutAuthorDataInput;
+}
+
+export interface ChatCreateOneWithoutMessagesInput {
+  create?: ChatCreateWithoutMessagesInput;
+  connect?: ChatWhereUniqueInput;
+}
+
+export interface ChatUpdateWithoutAuthorDataInput {
+  name?: String;
+  users?: UserUpdateManyWithoutChatsInput;
+  messages?: MessageUpdateManyWithoutChatInput;
+}
+
+export interface CommentCreateOneWithoutLikesInput {
+  create?: CommentCreateWithoutLikesInput;
+  connect?: CommentWhereUniqueInput;
+}
+
+export interface UserUpdateManyWithoutChatsInput {
+  create?: UserCreateWithoutChatsInput[] | UserCreateWithoutChatsInput;
+  delete?: UserWhereUniqueInput[] | UserWhereUniqueInput;
+  connect?: UserWhereUniqueInput[] | UserWhereUniqueInput;
+  disconnect?: UserWhereUniqueInput[] | UserWhereUniqueInput;
+  update?:
+    | UserUpdateWithWhereUniqueWithoutChatsInput[]
+    | UserUpdateWithWhereUniqueWithoutChatsInput;
+  upsert?:
+    | UserUpsertWithWhereUniqueWithoutChatsInput[]
+    | UserUpsertWithWhereUniqueWithoutChatsInput;
+  deleteMany?: UserScalarWhereInput[] | UserScalarWhereInput;
+  updateMany?:
+    | UserUpdateManyWithWhereNestedInput[]
+    | UserUpdateManyWithWhereNestedInput;
+}
+
+export interface LikeCreateManyWithoutCommentInput {
+  create?: LikeCreateWithoutCommentInput[] | LikeCreateWithoutCommentInput;
+  connect?: LikeWhereUniqueInput[] | LikeWhereUniqueInput;
+}
+
+export interface UserUpdateWithWhereUniqueWithoutChatsInput {
+  where: UserWhereUniqueInput;
+  data: UserUpdateWithoutChatsDataInput;
+}
+
+export interface ChatUpdateInput {
+  name?: String;
+  author?: UserUpdateOneRequiredWithoutMyChatsInput;
+  users?: UserUpdateManyWithoutChatsInput;
+  messages?: MessageUpdateManyWithoutChatInput;
+}
+
+export interface UserUpdateWithoutChatsDataInput {
+  email?: String;
+  password?: String;
+  name?: String;
+  posts?: PostUpdateManyWithoutAuthorInput;
+  comments?: CommentUpdateManyWithoutAuthorInput;
+  likes?: LikeUpdateManyWithoutAuthorInput;
+  myChats?: ChatUpdateManyWithoutAuthorInput;
+  messages?: MessageUpdateManyWithoutAuthorInput;
+}
+
+export interface UserUpdateWithoutMyChatsDataInput {
+  email?: String;
+  password?: String;
+  name?: String;
+  posts?: PostUpdateManyWithoutAuthorInput;
+  comments?: CommentUpdateManyWithoutAuthorInput;
+  likes?: LikeUpdateManyWithoutAuthorInput;
+  chats?: ChatUpdateManyWithoutUsersInput;
+  messages?: MessageUpdateManyWithoutAuthorInput;
+}
+
+export interface MessageUpdateManyWithoutAuthorInput {
+  create?: MessageCreateWithoutAuthorInput[] | MessageCreateWithoutAuthorInput;
+  delete?: MessageWhereUniqueInput[] | MessageWhereUniqueInput;
+  connect?: MessageWhereUniqueInput[] | MessageWhereUniqueInput;
+  disconnect?: MessageWhereUniqueInput[] | MessageWhereUniqueInput;
+  update?:
+    | MessageUpdateWithWhereUniqueWithoutAuthorInput[]
+    | MessageUpdateWithWhereUniqueWithoutAuthorInput;
+  upsert?:
+    | MessageUpsertWithWhereUniqueWithoutAuthorInput[]
+    | MessageUpsertWithWhereUniqueWithoutAuthorInput;
+  deleteMany?: MessageScalarWhereInput[] | MessageScalarWhereInput;
+  updateMany?:
+    | MessageUpdateManyWithWhereNestedInput[]
+    | MessageUpdateManyWithWhereNestedInput;
+}
+
+export interface PostSubscriptionWhereInput {
+  mutation_in?: MutationType[] | MutationType;
+  updatedFields_contains?: String;
+  updatedFields_contains_every?: String[] | String;
+  updatedFields_contains_some?: String[] | String;
+  node?: PostWhereInput;
+  AND?: PostSubscriptionWhereInput[] | PostSubscriptionWhereInput;
+  OR?: PostSubscriptionWhereInput[] | PostSubscriptionWhereInput;
+  NOT?: PostSubscriptionWhereInput[] | PostSubscriptionWhereInput;
+}
+
+export interface MessageUpdateWithWhereUniqueWithoutAuthorInput {
+  where: MessageWhereUniqueInput;
+  data: MessageUpdateWithoutAuthorDataInput;
+}
+
+export interface ChatSubscriptionWhereInput {
+  mutation_in?: MutationType[] | MutationType;
+  updatedFields_contains?: String;
+  updatedFields_contains_every?: String[] | String;
+  updatedFields_contains_some?: String[] | String;
+  node?: ChatWhereInput;
+  AND?: ChatSubscriptionWhereInput[] | ChatSubscriptionWhereInput;
+  OR?: ChatSubscriptionWhereInput[] | ChatSubscriptionWhereInput;
+  NOT?: ChatSubscriptionWhereInput[] | ChatSubscriptionWhereInput;
+}
+
+export interface MessageUpdateWithoutAuthorDataInput {
+  chat?: ChatUpdateOneRequiredWithoutMessagesInput;
+  content?: String;
+}
+
+export interface PostUpdateManyMutationInput {
+  published?: Boolean;
+  title?: String;
+  content?: String;
+}
+
+export interface ChatUpdateOneRequiredWithoutMessagesInput {
+  create?: ChatCreateWithoutMessagesInput;
+  update?: ChatUpdateWithoutMessagesDataInput;
+  upsert?: ChatUpsertWithoutMessagesInput;
+  connect?: ChatWhereUniqueInput;
+}
+
+export interface MessageUpdateManyMutationInput {
+  content?: String;
+}
+
+export interface ChatUpdateWithoutMessagesDataInput {
+  name?: String;
+  author?: UserUpdateOneRequiredWithoutMyChatsInput;
+  users?: UserUpdateManyWithoutChatsInput;
+}
+
+export interface LikeUpdateInput {
+  author?: UserUpdateOneRequiredWithoutLikesInput;
+  post?: PostUpdateOneWithoutLikesInput;
+  comment?: CommentUpdateOneWithoutLikesInput;
+}
+
+export interface ChatUpsertWithoutMessagesInput {
+  update: ChatUpdateWithoutMessagesDataInput;
+  create: ChatCreateWithoutMessagesInput;
+}
+
+export interface CommentUpdateInput {
+  author?: UserUpdateOneRequiredWithoutCommentsInput;
+  content?: String;
+  post?: PostUpdateOneRequiredWithoutCommentsInput;
+  likes?: LikeUpdateManyWithoutCommentInput;
+}
+
+export interface MessageUpsertWithWhereUniqueWithoutAuthorInput {
+  where: MessageWhereUniqueInput;
+  update: MessageUpdateWithoutAuthorDataInput;
+  create: MessageCreateWithoutAuthorInput;
+}
+
+export interface UserUpsertWithoutMyChatsInput {
+  update: UserUpdateWithoutMyChatsDataInput;
+  create: UserCreateWithoutMyChatsInput;
+}
+
+export interface MessageScalarWhereInput {
+  id?: ID_Input;
+  id_not?: ID_Input;
+  id_in?: ID_Input[] | ID_Input;
+  id_not_in?: ID_Input[] | ID_Input;
+  id_lt?: ID_Input;
+  id_lte?: ID_Input;
+  id_gt?: ID_Input;
+  id_gte?: ID_Input;
+  id_contains?: ID_Input;
+  id_not_contains?: ID_Input;
+  id_starts_with?: ID_Input;
+  id_not_starts_with?: ID_Input;
+  id_ends_with?: ID_Input;
+  id_not_ends_with?: ID_Input;
+  createdAt?: DateTimeInput;
+  createdAt_not?: DateTimeInput;
+  createdAt_in?: DateTimeInput[] | DateTimeInput;
+  createdAt_not_in?: DateTimeInput[] | DateTimeInput;
+  createdAt_lt?: DateTimeInput;
+  createdAt_lte?: DateTimeInput;
+  createdAt_gt?: DateTimeInput;
+  createdAt_gte?: DateTimeInput;
+  updatedAt?: DateTimeInput;
+  updatedAt_not?: DateTimeInput;
+  updatedAt_in?: DateTimeInput[] | DateTimeInput;
+  updatedAt_not_in?: DateTimeInput[] | DateTimeInput;
+  updatedAt_lt?: DateTimeInput;
+  updatedAt_lte?: DateTimeInput;
+  updatedAt_gt?: DateTimeInput;
+  updatedAt_gte?: DateTimeInput;
+  content?: String;
+  content_not?: String;
+  content_in?: String[] | String;
+  content_not_in?: String[] | String;
+  content_lt?: String;
+  content_lte?: String;
+  content_gt?: String;
+  content_gte?: String;
+  content_contains?: String;
+  content_not_contains?: String;
+  content_starts_with?: String;
+  content_not_starts_with?: String;
+  content_ends_with?: String;
+  content_not_ends_with?: String;
+  AND?: MessageScalarWhereInput[] | MessageScalarWhereInput;
+  OR?: MessageScalarWhereInput[] | MessageScalarWhereInput;
+  NOT?: MessageScalarWhereInput[] | MessageScalarWhereInput;
 }
 
 export interface PostScalarWhereInput {
@@ -936,80 +1524,44 @@ export interface PostScalarWhereInput {
   NOT?: PostScalarWhereInput[] | PostScalarWhereInput;
 }
 
-export interface PostUpdateWithoutLikesDataInput {
-  published?: Boolean;
-  title?: String;
-  content?: String;
-  author?: UserUpdateOneRequiredWithoutPostsInput;
-  comments?: CommentUpdateManyWithoutPostInput;
+export interface MessageUpdateManyWithWhereNestedInput {
+  where: MessageScalarWhereInput;
+  data: MessageUpdateManyDataInput;
 }
 
-export interface CommentCreateInput {
-  author: UserCreateOneWithoutCommentsInput;
-  content: String;
-  post: PostCreateOneWithoutCommentsInput;
-  likes?: LikeCreateManyWithoutCommentInput;
-}
-
-export interface PostUpsertWithoutLikesInput {
-  update: PostUpdateWithoutLikesDataInput;
-  create: PostCreateWithoutLikesInput;
-}
-
-export interface PostCreateWithoutAuthorInput {
-  published?: Boolean;
-  title: String;
-  content: String;
-  comments?: CommentCreateManyWithoutPostInput;
-  likes?: LikeCreateManyWithoutPostInput;
-}
-
-export interface CommentUpdateOneWithoutLikesInput {
-  create?: CommentCreateWithoutLikesInput;
-  update?: CommentUpdateWithoutLikesDataInput;
-  upsert?: CommentUpsertWithoutLikesInput;
-  delete?: Boolean;
-  disconnect?: Boolean;
-  connect?: CommentWhereUniqueInput;
-}
-
-export interface LikeCreateWithoutCommentInput {
-  author: UserCreateOneWithoutLikesInput;
-  post?: PostCreateOneWithoutLikesInput;
-}
-
-export interface CommentUpdateWithoutLikesDataInput {
-  author?: UserUpdateOneRequiredWithoutCommentsInput;
-  content?: String;
-  post?: PostUpdateOneRequiredWithoutCommentsInput;
-}
-
-export interface CommentCreateWithoutAuthorInput {
-  content: String;
-  post: PostCreateOneWithoutCommentsInput;
-  likes?: LikeCreateManyWithoutCommentInput;
-}
-
-export interface CommentUpsertWithoutLikesInput {
-  update: CommentUpdateWithoutLikesDataInput;
-  create: CommentCreateWithoutLikesInput;
-}
-
-export interface UserCreateWithoutPostsInput {
+export interface UserCreateWithoutMyChatsInput {
   email: String;
   password: String;
   name: String;
+  posts?: PostCreateManyWithoutAuthorInput;
   comments?: CommentCreateManyWithoutAuthorInput;
   likes?: LikeCreateManyWithoutAuthorInput;
+  chats?: ChatCreateManyWithoutUsersInput;
+  messages?: MessageCreateManyWithoutAuthorInput;
 }
 
-export interface LikeUpsertWithWhereUniqueWithoutAuthorInput {
-  where: LikeWhereUniqueInput;
-  update: LikeUpdateWithoutAuthorDataInput;
-  create: LikeCreateWithoutAuthorInput;
+export interface MessageUpdateManyDataInput {
+  content?: String;
 }
 
-export interface CommentWhereInput {
+export interface CommentCreateWithoutPostInput {
+  author: UserCreateOneWithoutCommentsInput;
+  content: String;
+  likes?: LikeCreateManyWithoutCommentInput;
+}
+
+export interface UserUpsertWithWhereUniqueWithoutChatsInput {
+  where: UserWhereUniqueInput;
+  update: UserUpdateWithoutChatsDataInput;
+  create: UserCreateWithoutChatsInput;
+}
+
+export interface LikeCreateWithoutAuthorInput {
+  post?: PostCreateOneWithoutLikesInput;
+  comment?: CommentCreateOneWithoutLikesInput;
+}
+
+export interface UserScalarWhereInput {
   id?: ID_Input;
   id_not?: ID_Input;
   id_in?: ID_Input[] | ID_Input;
@@ -1024,28 +1576,295 @@ export interface CommentWhereInput {
   id_not_starts_with?: ID_Input;
   id_ends_with?: ID_Input;
   id_not_ends_with?: ID_Input;
-  author?: UserWhereInput;
+  email?: String;
+  email_not?: String;
+  email_in?: String[] | String;
+  email_not_in?: String[] | String;
+  email_lt?: String;
+  email_lte?: String;
+  email_gt?: String;
+  email_gte?: String;
+  email_contains?: String;
+  email_not_contains?: String;
+  email_starts_with?: String;
+  email_not_starts_with?: String;
+  email_ends_with?: String;
+  email_not_ends_with?: String;
+  password?: String;
+  password_not?: String;
+  password_in?: String[] | String;
+  password_not_in?: String[] | String;
+  password_lt?: String;
+  password_lte?: String;
+  password_gt?: String;
+  password_gte?: String;
+  password_contains?: String;
+  password_not_contains?: String;
+  password_starts_with?: String;
+  password_not_starts_with?: String;
+  password_ends_with?: String;
+  password_not_ends_with?: String;
+  name?: String;
+  name_not?: String;
+  name_in?: String[] | String;
+  name_not_in?: String[] | String;
+  name_lt?: String;
+  name_lte?: String;
+  name_gt?: String;
+  name_gte?: String;
+  name_contains?: String;
+  name_not_contains?: String;
+  name_starts_with?: String;
+  name_not_starts_with?: String;
+  name_ends_with?: String;
+  name_not_ends_with?: String;
+  createdAt?: DateTimeInput;
+  createdAt_not?: DateTimeInput;
+  createdAt_in?: DateTimeInput[] | DateTimeInput;
+  createdAt_not_in?: DateTimeInput[] | DateTimeInput;
+  createdAt_lt?: DateTimeInput;
+  createdAt_lte?: DateTimeInput;
+  createdAt_gt?: DateTimeInput;
+  createdAt_gte?: DateTimeInput;
+  AND?: UserScalarWhereInput[] | UserScalarWhereInput;
+  OR?: UserScalarWhereInput[] | UserScalarWhereInput;
+  NOT?: UserScalarWhereInput[] | UserScalarWhereInput;
+}
+
+export interface UserCreateWithoutPostsInput {
+  email: String;
+  password: String;
+  name: String;
+  comments?: CommentCreateManyWithoutAuthorInput;
+  likes?: LikeCreateManyWithoutAuthorInput;
+  chats?: ChatCreateManyWithoutUsersInput;
+  myChats?: ChatCreateManyWithoutAuthorInput;
+  messages?: MessageCreateManyWithoutAuthorInput;
+}
+
+export interface UserUpdateManyWithWhereNestedInput {
+  where: UserScalarWhereInput;
+  data: UserUpdateManyDataInput;
+}
+
+export interface PostCreateWithoutCommentsInput {
+  published?: Boolean;
+  title: String;
+  content: String;
+  author: UserCreateOneWithoutPostsInput;
+  likes?: LikeCreateManyWithoutPostInput;
+}
+
+export interface UserUpdateManyDataInput {
+  email?: String;
+  password?: String;
+  name?: String;
+}
+
+export interface UserCreateWithoutLikesInput {
+  email: String;
+  password: String;
+  name: String;
+  posts?: PostCreateManyWithoutAuthorInput;
+  comments?: CommentCreateManyWithoutAuthorInput;
+  chats?: ChatCreateManyWithoutUsersInput;
+  myChats?: ChatCreateManyWithoutAuthorInput;
+  messages?: MessageCreateManyWithoutAuthorInput;
+}
+
+export interface ChatUpsertWithWhereUniqueWithoutAuthorInput {
+  where: ChatWhereUniqueInput;
+  update: ChatUpdateWithoutAuthorDataInput;
+  create: ChatCreateWithoutAuthorInput;
+}
+
+export interface MessageCreateWithoutChatInput {
+  author: UserCreateOneWithoutMessagesInput;
+  content: String;
+}
+
+export interface ChatScalarWhereInput {
+  id?: ID_Input;
+  id_not?: ID_Input;
+  id_in?: ID_Input[] | ID_Input;
+  id_not_in?: ID_Input[] | ID_Input;
+  id_lt?: ID_Input;
+  id_lte?: ID_Input;
+  id_gt?: ID_Input;
+  id_gte?: ID_Input;
+  id_contains?: ID_Input;
+  id_not_contains?: ID_Input;
+  id_starts_with?: ID_Input;
+  id_not_starts_with?: ID_Input;
+  id_ends_with?: ID_Input;
+  id_not_ends_with?: ID_Input;
+  createdAt?: DateTimeInput;
+  createdAt_not?: DateTimeInput;
+  createdAt_in?: DateTimeInput[] | DateTimeInput;
+  createdAt_not_in?: DateTimeInput[] | DateTimeInput;
+  createdAt_lt?: DateTimeInput;
+  createdAt_lte?: DateTimeInput;
+  createdAt_gt?: DateTimeInput;
+  createdAt_gte?: DateTimeInput;
+  updatedAt?: DateTimeInput;
+  updatedAt_not?: DateTimeInput;
+  updatedAt_in?: DateTimeInput[] | DateTimeInput;
+  updatedAt_not_in?: DateTimeInput[] | DateTimeInput;
+  updatedAt_lt?: DateTimeInput;
+  updatedAt_lte?: DateTimeInput;
+  updatedAt_gt?: DateTimeInput;
+  updatedAt_gte?: DateTimeInput;
+  name?: String;
+  name_not?: String;
+  name_in?: String[] | String;
+  name_not_in?: String[] | String;
+  name_lt?: String;
+  name_lte?: String;
+  name_gt?: String;
+  name_gte?: String;
+  name_contains?: String;
+  name_not_contains?: String;
+  name_starts_with?: String;
+  name_not_starts_with?: String;
+  name_ends_with?: String;
+  name_not_ends_with?: String;
+  AND?: ChatScalarWhereInput[] | ChatScalarWhereInput;
+  OR?: ChatScalarWhereInput[] | ChatScalarWhereInput;
+  NOT?: ChatScalarWhereInput[] | ChatScalarWhereInput;
+}
+
+export interface ChatCreateWithoutAuthorInput {
+  name: String;
+  users?: UserCreateManyWithoutChatsInput;
+  messages?: MessageCreateManyWithoutChatInput;
+}
+
+export interface ChatUpdateManyWithWhereNestedInput {
+  where: ChatScalarWhereInput;
+  data: ChatUpdateManyDataInput;
+}
+
+export interface MessageCreateWithoutAuthorInput {
+  chat: ChatCreateOneWithoutMessagesInput;
+  content: String;
+}
+
+export interface ChatUpdateManyDataInput {
+  name?: String;
+}
+
+export interface CommentCreateWithoutLikesInput {
+  author: UserCreateOneWithoutCommentsInput;
+  content: String;
+  post: PostCreateOneWithoutCommentsInput;
+}
+
+export interface UserUpsertWithoutMessagesInput {
+  update: UserUpdateWithoutMessagesDataInput;
+  create: UserCreateWithoutMessagesInput;
+}
+
+export interface UserUpdateOneRequiredWithoutMyChatsInput {
+  create?: UserCreateWithoutMyChatsInput;
+  update?: UserUpdateWithoutMyChatsDataInput;
+  upsert?: UserUpsertWithoutMyChatsInput;
+  connect?: UserWhereUniqueInput;
+}
+
+export interface MessageUpsertWithWhereUniqueWithoutChatInput {
+  where: MessageWhereUniqueInput;
+  update: MessageUpdateWithoutChatDataInput;
+  create: MessageCreateWithoutChatInput;
+}
+
+export interface LikeSubscriptionWhereInput {
+  mutation_in?: MutationType[] | MutationType;
+  updatedFields_contains?: String;
+  updatedFields_contains_every?: String[] | String;
+  updatedFields_contains_some?: String[] | String;
+  node?: LikeWhereInput;
+  AND?: LikeSubscriptionWhereInput[] | LikeSubscriptionWhereInput;
+  OR?: LikeSubscriptionWhereInput[] | LikeSubscriptionWhereInput;
+  NOT?: LikeSubscriptionWhereInput[] | LikeSubscriptionWhereInput;
+}
+
+export interface ChatUpsertWithWhereUniqueWithoutUsersInput {
+  where: ChatWhereUniqueInput;
+  update: ChatUpdateWithoutUsersDataInput;
+  create: ChatCreateWithoutUsersInput;
+}
+
+export interface PostUpdateInput {
+  published?: Boolean;
+  title?: String;
   content?: String;
-  content_not?: String;
-  content_in?: String[] | String;
-  content_not_in?: String[] | String;
-  content_lt?: String;
-  content_lte?: String;
-  content_gt?: String;
-  content_gte?: String;
-  content_contains?: String;
-  content_not_contains?: String;
-  content_starts_with?: String;
-  content_not_starts_with?: String;
-  content_ends_with?: String;
-  content_not_ends_with?: String;
-  post?: PostWhereInput;
-  likes_every?: LikeWhereInput;
-  likes_some?: LikeWhereInput;
-  likes_none?: LikeWhereInput;
-  AND?: CommentWhereInput[] | CommentWhereInput;
-  OR?: CommentWhereInput[] | CommentWhereInput;
-  NOT?: CommentWhereInput[] | CommentWhereInput;
+  author?: UserUpdateOneRequiredWithoutPostsInput;
+  comments?: CommentUpdateManyWithoutPostInput;
+  likes?: LikeUpdateManyWithoutPostInput;
+}
+
+export interface UserUpsertWithoutLikesInput {
+  update: UserUpdateWithoutLikesDataInput;
+  create: UserCreateWithoutLikesInput;
+}
+
+export interface LikeCreateInput {
+  author: UserCreateOneWithoutLikesInput;
+  post?: PostCreateOneWithoutLikesInput;
+  comment?: CommentCreateOneWithoutLikesInput;
+}
+
+export interface CommentUpdateOneWithoutLikesInput {
+  create?: CommentCreateWithoutLikesInput;
+  update?: CommentUpdateWithoutLikesDataInput;
+  upsert?: CommentUpsertWithoutLikesInput;
+  delete?: Boolean;
+  disconnect?: Boolean;
+  connect?: CommentWhereUniqueInput;
+}
+
+export interface PostUpdateManyDataInput {
+  published?: Boolean;
+  title?: String;
+  content?: String;
+}
+
+export interface CommentUpdateWithoutLikesDataInput {
+  author?: UserUpdateOneRequiredWithoutCommentsInput;
+  content?: String;
+  post?: PostUpdateOneRequiredWithoutCommentsInput;
+}
+
+export interface PostCreateWithoutAuthorInput {
+  published?: Boolean;
+  title: String;
+  content: String;
+  comments?: CommentCreateManyWithoutPostInput;
+  likes?: LikeCreateManyWithoutPostInput;
+}
+
+export interface CommentUpsertWithoutLikesInput {
+  update: CommentUpdateWithoutLikesDataInput;
+  create: CommentCreateWithoutLikesInput;
+}
+
+export interface PostCreateWithoutLikesInput {
+  published?: Boolean;
+  title: String;
+  content: String;
+  author: UserCreateOneWithoutPostsInput;
+  comments?: CommentCreateManyWithoutPostInput;
+}
+
+export interface LikeUpsertWithWhereUniqueWithoutPostInput {
+  where: LikeWhereUniqueInput;
+  update: LikeUpdateWithoutPostDataInput;
+  create: LikeCreateWithoutPostInput;
+}
+
+export interface LikeCreateWithoutPostInput {
+  author: UserCreateOneWithoutLikesInput;
+  comment?: CommentCreateOneWithoutLikesInput;
 }
 
 export interface LikeScalarWhereInput {
@@ -1076,83 +1895,15 @@ export interface LikeScalarWhereInput {
   NOT?: LikeScalarWhereInput[] | LikeScalarWhereInput;
 }
 
-export interface UserUpdateInput {
-  email?: String;
-  password?: String;
-  name?: String;
-  posts?: PostUpdateManyWithoutAuthorInput;
-  comments?: CommentUpdateManyWithoutAuthorInput;
-  likes?: LikeUpdateManyWithoutAuthorInput;
-}
-
-export interface UserUpsertWithoutPostsInput {
-  update: UserUpdateWithoutPostsDataInput;
-  create: UserCreateWithoutPostsInput;
-}
-
-export type PostWhereUniqueInput = AtLeastOne<{
-  id: ID_Input;
-}>;
-
-export interface LikeUpdateManyWithoutPostInput {
-  create?: LikeCreateWithoutPostInput[] | LikeCreateWithoutPostInput;
-  delete?: LikeWhereUniqueInput[] | LikeWhereUniqueInput;
-  connect?: LikeWhereUniqueInput[] | LikeWhereUniqueInput;
-  disconnect?: LikeWhereUniqueInput[] | LikeWhereUniqueInput;
-  update?:
-    | LikeUpdateWithWhereUniqueWithoutPostInput[]
-    | LikeUpdateWithWhereUniqueWithoutPostInput;
-  upsert?:
-    | LikeUpsertWithWhereUniqueWithoutPostInput[]
-    | LikeUpsertWithWhereUniqueWithoutPostInput;
-  deleteMany?: LikeScalarWhereInput[] | LikeScalarWhereInput;
-}
-
-export interface CommentUpsertWithWhereUniqueWithoutPostInput {
-  where: CommentWhereUniqueInput;
-  update: CommentUpdateWithoutPostDataInput;
-  create: CommentCreateWithoutPostInput;
-}
-
-export interface LikeUpdateWithWhereUniqueWithoutPostInput {
-  where: LikeWhereUniqueInput;
-  data: LikeUpdateWithoutPostDataInput;
-}
-
-export interface CommentCreateWithoutPostInput {
-  author: UserCreateOneWithoutCommentsInput;
-  content: String;
-  likes?: LikeCreateManyWithoutCommentInput;
-}
-
-export interface LikeUpdateWithoutPostDataInput {
-  author?: UserUpdateOneRequiredWithoutLikesInput;
-  comment?: CommentUpdateOneWithoutLikesInput;
-}
-
-export interface PostCreateWithoutCommentsInput {
-  published?: Boolean;
-  title: String;
-  content: String;
-  author: UserCreateOneWithoutPostsInput;
-  likes?: LikeCreateManyWithoutPostInput;
-}
-
-export interface LikeUpsertWithWhereUniqueWithoutPostInput {
-  where: LikeWhereUniqueInput;
-  update: LikeUpdateWithoutPostDataInput;
-  create: LikeCreateWithoutPostInput;
-}
-
-export interface PostSubscriptionWhereInput {
-  mutation_in?: MutationType[] | MutationType;
-  updatedFields_contains?: String;
-  updatedFields_contains_every?: String[] | String;
-  updatedFields_contains_some?: String[] | String;
-  node?: PostWhereInput;
-  AND?: PostSubscriptionWhereInput[] | PostSubscriptionWhereInput;
-  OR?: PostSubscriptionWhereInput[] | PostSubscriptionWhereInput;
-  NOT?: PostSubscriptionWhereInput[] | PostSubscriptionWhereInput;
+export interface UserCreateWithoutMessagesInput {
+  email: String;
+  password: String;
+  name: String;
+  posts?: PostCreateManyWithoutAuthorInput;
+  comments?: CommentCreateManyWithoutAuthorInput;
+  likes?: LikeCreateManyWithoutAuthorInput;
+  chats?: ChatCreateManyWithoutUsersInput;
+  myChats?: ChatCreateManyWithoutAuthorInput;
 }
 
 export interface PostUpsertWithoutCommentsInput {
@@ -1160,18 +1911,87 @@ export interface PostUpsertWithoutCommentsInput {
   create: PostCreateWithoutCommentsInput;
 }
 
-export type UserWhereUniqueInput = AtLeastOne<{
-  id: ID_Input;
-  email?: String;
-}>;
+export interface ChatCreateWithoutMessagesInput {
+  name: String;
+  author: UserCreateOneWithoutMyChatsInput;
+  users?: UserCreateManyWithoutChatsInput;
+}
 
-export interface CommentUpdateManyDataInput {
+export interface LikeUpdateManyWithoutCommentInput {
+  create?: LikeCreateWithoutCommentInput[] | LikeCreateWithoutCommentInput;
+  delete?: LikeWhereUniqueInput[] | LikeWhereUniqueInput;
+  connect?: LikeWhereUniqueInput[] | LikeWhereUniqueInput;
+  disconnect?: LikeWhereUniqueInput[] | LikeWhereUniqueInput;
+  update?:
+    | LikeUpdateWithWhereUniqueWithoutCommentInput[]
+    | LikeUpdateWithWhereUniqueWithoutCommentInput;
+  upsert?:
+    | LikeUpsertWithWhereUniqueWithoutCommentInput[]
+    | LikeUpsertWithWhereUniqueWithoutCommentInput;
+  deleteMany?: LikeScalarWhereInput[] | LikeScalarWhereInput;
+}
+
+export interface UserSubscriptionWhereInput {
+  mutation_in?: MutationType[] | MutationType;
+  updatedFields_contains?: String;
+  updatedFields_contains_every?: String[] | String;
+  updatedFields_contains_some?: String[] | String;
+  node?: UserWhereInput;
+  AND?: UserSubscriptionWhereInput[] | UserSubscriptionWhereInput;
+  OR?: UserSubscriptionWhereInput[] | UserSubscriptionWhereInput;
+  NOT?: UserSubscriptionWhereInput[] | UserSubscriptionWhereInput;
+}
+
+export interface LikeUpdateWithWhereUniqueWithoutCommentInput {
+  where: LikeWhereUniqueInput;
+  data: LikeUpdateWithoutCommentDataInput;
+}
+
+export interface MessageUpdateInput {
+  chat?: ChatUpdateOneRequiredWithoutMessagesInput;
+  author?: UserUpdateOneRequiredWithoutMessagesInput;
   content?: String;
 }
 
-export interface CommentUpdateManyWithWhereNestedInput {
-  where: CommentScalarWhereInput;
-  data: CommentUpdateManyDataInput;
+export interface LikeUpdateWithoutCommentDataInput {
+  author?: UserUpdateOneRequiredWithoutLikesInput;
+  post?: PostUpdateOneWithoutLikesInput;
+}
+
+export interface ChatCreateInput {
+  name: String;
+  author: UserCreateOneWithoutMyChatsInput;
+  users?: UserCreateManyWithoutChatsInput;
+  messages?: MessageCreateManyWithoutChatInput;
+}
+
+export interface LikeUpsertWithWhereUniqueWithoutCommentInput {
+  where: LikeWhereUniqueInput;
+  update: LikeUpdateWithoutCommentDataInput;
+  create: LikeCreateWithoutCommentInput;
+}
+
+export interface CommentCreateWithoutAuthorInput {
+  content: String;
+  post: PostCreateOneWithoutCommentsInput;
+  likes?: LikeCreateManyWithoutCommentInput;
+}
+
+export interface CommentUpsertWithWhereUniqueWithoutAuthorInput {
+  where: CommentWhereUniqueInput;
+  update: CommentUpdateWithoutAuthorDataInput;
+  create: CommentCreateWithoutAuthorInput;
+}
+
+export interface UserCreateWithoutChatsInput {
+  email: String;
+  password: String;
+  name: String;
+  posts?: PostCreateManyWithoutAuthorInput;
+  comments?: CommentCreateManyWithoutAuthorInput;
+  likes?: LikeCreateManyWithoutAuthorInput;
+  myChats?: ChatCreateManyWithoutAuthorInput;
+  messages?: MessageCreateManyWithoutAuthorInput;
 }
 
 export interface CommentScalarWhereInput {
@@ -1208,10 +2028,53 @@ export interface CommentScalarWhereInput {
   NOT?: CommentScalarWhereInput[] | CommentScalarWhereInput;
 }
 
-export interface CommentUpsertWithWhereUniqueWithoutAuthorInput {
-  where: CommentWhereUniqueInput;
-  update: CommentUpdateWithoutAuthorDataInput;
-  create: CommentCreateWithoutAuthorInput;
+export interface UserUpdateInput {
+  email?: String;
+  password?: String;
+  name?: String;
+  posts?: PostUpdateManyWithoutAuthorInput;
+  comments?: CommentUpdateManyWithoutAuthorInput;
+  likes?: LikeUpdateManyWithoutAuthorInput;
+  chats?: ChatUpdateManyWithoutUsersInput;
+  myChats?: ChatUpdateManyWithoutAuthorInput;
+  messages?: MessageUpdateManyWithoutAuthorInput;
+}
+
+export interface PostUpsertWithoutLikesInput {
+  update: PostUpdateWithoutLikesDataInput;
+  create: PostCreateWithoutLikesInput;
+}
+
+export interface UserUpsertWithoutPostsInput {
+  update: UserUpdateWithoutPostsDataInput;
+  create: UserCreateWithoutPostsInput;
+}
+
+export interface CommentUpdateManyDataInput {
+  content?: String;
+}
+
+export interface CommentUpdateManyWithWhereNestedInput {
+  where: CommentScalarWhereInput;
+  data: CommentUpdateManyDataInput;
+}
+
+export interface CommentCreateInput {
+  author: UserCreateOneWithoutCommentsInput;
+  content: String;
+  post: PostCreateOneWithoutCommentsInput;
+  likes?: LikeCreateManyWithoutCommentInput;
+}
+
+export interface LikeCreateWithoutCommentInput {
+  author: UserCreateOneWithoutLikesInput;
+  post?: PostCreateOneWithoutLikesInput;
+}
+
+export interface ChatCreateWithoutUsersInput {
+  name: String;
+  author: UserCreateOneWithoutMyChatsInput;
+  messages?: MessageCreateManyWithoutChatInput;
 }
 
 export interface UserCreateWithoutCommentsInput {
@@ -1220,23 +2083,9 @@ export interface UserCreateWithoutCommentsInput {
   name: String;
   posts?: PostCreateManyWithoutAuthorInput;
   likes?: LikeCreateManyWithoutAuthorInput;
-}
-
-export type LikeWhereUniqueInput = AtLeastOne<{
-  id: ID_Input;
-}>;
-
-export interface LikeCreateWithoutAuthorInput {
-  post?: PostCreateOneWithoutLikesInput;
-  comment?: CommentCreateOneWithoutLikesInput;
-}
-
-export interface UserCreateWithoutLikesInput {
-  email: String;
-  password: String;
-  name: String;
-  posts?: PostCreateManyWithoutAuthorInput;
-  comments?: CommentCreateManyWithoutAuthorInput;
+  chats?: ChatCreateManyWithoutUsersInput;
+  myChats?: ChatCreateManyWithoutAuthorInput;
+  messages?: MessageCreateManyWithoutAuthorInput;
 }
 
 export interface NodeNode {
@@ -1271,20 +2120,20 @@ export interface UserPreviousValuesSubscription
   createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
 }
 
-export interface AggregateComment {
-  count: Int;
+export interface ChatEdge {
+  cursor: String;
 }
 
-export interface AggregateCommentPromise
-  extends Promise<AggregateComment>,
-    Fragmentable {
-  count: () => Promise<Int>;
+export interface ChatEdgePromise extends Promise<ChatEdge>, Fragmentable {
+  node: <T = ChatPromise>() => T;
+  cursor: () => Promise<String>;
 }
 
-export interface AggregateCommentSubscription
-  extends Promise<AsyncIterator<AggregateComment>>,
+export interface ChatEdgeSubscription
+  extends Promise<AsyncIterator<ChatEdge>>,
     Fragmentable {
-  count: () => Promise<AsyncIterator<Int>>;
+  node: <T = ChatSubscription>() => T;
+  cursor: () => Promise<AsyncIterator<String>>;
 }
 
 export interface Post {
@@ -1362,20 +2211,86 @@ export interface PostSubscription
   ) => T;
 }
 
-export interface CommentEdge {
-  cursor: String;
+export interface AggregateChat {
+  count: Int;
 }
 
-export interface CommentEdgePromise extends Promise<CommentEdge>, Fragmentable {
-  node: <T = CommentPromise>() => T;
-  cursor: () => Promise<String>;
-}
-
-export interface CommentEdgeSubscription
-  extends Promise<AsyncIterator<CommentEdge>>,
+export interface AggregateChatPromise
+  extends Promise<AggregateChat>,
     Fragmentable {
-  node: <T = CommentSubscription>() => T;
-  cursor: () => Promise<AsyncIterator<String>>;
+  count: () => Promise<Int>;
+}
+
+export interface AggregateChatSubscription
+  extends Promise<AsyncIterator<AggregateChat>>,
+    Fragmentable {
+  count: () => Promise<AsyncIterator<Int>>;
+}
+
+export interface Like {
+  id: ID_Output;
+  createdAt: DateTimeOutput;
+}
+
+export interface LikePromise extends Promise<Like>, Fragmentable {
+  id: () => Promise<ID_Output>;
+  createdAt: () => Promise<DateTimeOutput>;
+  author: <T = UserPromise>() => T;
+  post: <T = PostPromise>() => T;
+  comment: <T = CommentPromise>() => T;
+}
+
+export interface LikeSubscription
+  extends Promise<AsyncIterator<Like>>,
+    Fragmentable {
+  id: () => Promise<AsyncIterator<ID_Output>>;
+  createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+  author: <T = UserSubscription>() => T;
+  post: <T = PostSubscription>() => T;
+  comment: <T = CommentSubscription>() => T;
+}
+
+export interface Comment {
+  id: ID_Output;
+  content: String;
+}
+
+export interface CommentPromise extends Promise<Comment>, Fragmentable {
+  id: () => Promise<ID_Output>;
+  author: <T = UserPromise>() => T;
+  content: () => Promise<String>;
+  post: <T = PostPromise>() => T;
+  likes: <T = FragmentableArray<Like>>(
+    args?: {
+      where?: LikeWhereInput;
+      orderBy?: LikeOrderByInput;
+      skip?: Int;
+      after?: String;
+      before?: String;
+      first?: Int;
+      last?: Int;
+    }
+  ) => T;
+}
+
+export interface CommentSubscription
+  extends Promise<AsyncIterator<Comment>>,
+    Fragmentable {
+  id: () => Promise<AsyncIterator<ID_Output>>;
+  author: <T = UserSubscription>() => T;
+  content: () => Promise<AsyncIterator<String>>;
+  post: <T = PostSubscription>() => T;
+  likes: <T = Promise<AsyncIterator<LikeSubscription>>>(
+    args?: {
+      where?: LikeWhereInput;
+      orderBy?: LikeOrderByInput;
+      skip?: Int;
+      after?: String;
+      before?: String;
+      first?: Int;
+      last?: Int;
+    }
+  ) => T;
 }
 
 export interface PageInfo {
@@ -1435,79 +2350,38 @@ export interface UserConnectionSubscription
   aggregate: <T = AggregateUserSubscription>() => T;
 }
 
-export interface CommentConnection {}
+export interface ChatConnection {}
 
-export interface CommentConnectionPromise
-  extends Promise<CommentConnection>,
+export interface ChatConnectionPromise
+  extends Promise<ChatConnection>,
     Fragmentable {
   pageInfo: <T = PageInfoPromise>() => T;
-  edges: <T = FragmentableArray<CommentEdge>>() => T;
-  aggregate: <T = AggregateCommentPromise>() => T;
+  edges: <T = FragmentableArray<ChatEdge>>() => T;
+  aggregate: <T = AggregateChatPromise>() => T;
 }
 
-export interface CommentConnectionSubscription
-  extends Promise<AsyncIterator<CommentConnection>>,
+export interface ChatConnectionSubscription
+  extends Promise<AsyncIterator<ChatConnection>>,
     Fragmentable {
   pageInfo: <T = PageInfoSubscription>() => T;
-  edges: <T = Promise<AsyncIterator<CommentEdgeSubscription>>>() => T;
-  aggregate: <T = AggregateCommentSubscription>() => T;
+  edges: <T = Promise<AsyncIterator<ChatEdgeSubscription>>>() => T;
+  aggregate: <T = AggregateChatSubscription>() => T;
 }
 
-export interface AggregatePost {
-  count: Int;
+export interface PostEdge {
+  cursor: String;
 }
 
-export interface AggregatePostPromise
-  extends Promise<AggregatePost>,
+export interface PostEdgePromise extends Promise<PostEdge>, Fragmentable {
+  node: <T = PostPromise>() => T;
+  cursor: () => Promise<String>;
+}
+
+export interface PostEdgeSubscription
+  extends Promise<AsyncIterator<PostEdge>>,
     Fragmentable {
-  count: () => Promise<Int>;
-}
-
-export interface AggregatePostSubscription
-  extends Promise<AsyncIterator<AggregatePost>>,
-    Fragmentable {
-  count: () => Promise<AsyncIterator<Int>>;
-}
-
-export interface Like {
-  id: ID_Output;
-  createdAt: DateTimeOutput;
-}
-
-export interface LikePromise extends Promise<Like>, Fragmentable {
-  id: () => Promise<ID_Output>;
-  createdAt: () => Promise<DateTimeOutput>;
-  author: <T = UserPromise>() => T;
-  post: <T = PostPromise>() => T;
-  comment: <T = CommentPromise>() => T;
-}
-
-export interface LikeSubscription
-  extends Promise<AsyncIterator<Like>>,
-    Fragmentable {
-  id: () => Promise<AsyncIterator<ID_Output>>;
-  createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
-  author: <T = UserSubscription>() => T;
-  post: <T = PostSubscription>() => T;
-  comment: <T = CommentSubscription>() => T;
-}
-
-export interface PostConnection {}
-
-export interface PostConnectionPromise
-  extends Promise<PostConnection>,
-    Fragmentable {
-  pageInfo: <T = PageInfoPromise>() => T;
-  edges: <T = FragmentableArray<PostEdge>>() => T;
-  aggregate: <T = AggregatePostPromise>() => T;
-}
-
-export interface PostConnectionSubscription
-  extends Promise<AsyncIterator<PostConnection>>,
-    Fragmentable {
-  pageInfo: <T = PageInfoSubscription>() => T;
-  edges: <T = Promise<AsyncIterator<PostEdgeSubscription>>>() => T;
-  aggregate: <T = AggregatePostSubscription>() => T;
+  node: <T = PostSubscription>() => T;
+  cursor: () => Promise<AsyncIterator<String>>;
 }
 
 export interface PostPreviousValues {
@@ -1564,20 +2438,34 @@ export interface UserSubscriptionPayloadSubscription
   previousValues: <T = UserPreviousValuesSubscription>() => T;
 }
 
-export interface Comment {
+export interface Chat {
   id: ID_Output;
-  content: String;
+  createdAt: DateTimeOutput;
+  updatedAt: DateTimeOutput;
+  name: String;
 }
 
-export interface CommentPromise extends Promise<Comment>, Fragmentable {
+export interface ChatPromise extends Promise<Chat>, Fragmentable {
   id: () => Promise<ID_Output>;
+  createdAt: () => Promise<DateTimeOutput>;
+  updatedAt: () => Promise<DateTimeOutput>;
+  name: () => Promise<String>;
   author: <T = UserPromise>() => T;
-  content: () => Promise<String>;
-  post: <T = PostPromise>() => T;
-  likes: <T = FragmentableArray<Like>>(
+  users: <T = FragmentableArray<User>>(
     args?: {
-      where?: LikeWhereInput;
-      orderBy?: LikeOrderByInput;
+      where?: UserWhereInput;
+      orderBy?: UserOrderByInput;
+      skip?: Int;
+      after?: String;
+      before?: String;
+      first?: Int;
+      last?: Int;
+    }
+  ) => T;
+  messages: <T = FragmentableArray<Message>>(
+    args?: {
+      where?: MessageWhereInput;
+      orderBy?: MessageOrderByInput;
       skip?: Int;
       after?: String;
       before?: String;
@@ -1587,17 +2475,18 @@ export interface CommentPromise extends Promise<Comment>, Fragmentable {
   ) => T;
 }
 
-export interface CommentSubscription
-  extends Promise<AsyncIterator<Comment>>,
+export interface ChatSubscription
+  extends Promise<AsyncIterator<Chat>>,
     Fragmentable {
   id: () => Promise<AsyncIterator<ID_Output>>;
+  createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+  updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+  name: () => Promise<AsyncIterator<String>>;
   author: <T = UserSubscription>() => T;
-  content: () => Promise<AsyncIterator<String>>;
-  post: <T = PostSubscription>() => T;
-  likes: <T = Promise<AsyncIterator<LikeSubscription>>>(
+  users: <T = Promise<AsyncIterator<UserSubscription>>>(
     args?: {
-      where?: LikeWhereInput;
-      orderBy?: LikeOrderByInput;
+      where?: UserWhereInput;
+      orderBy?: UserOrderByInput;
       skip?: Int;
       after?: String;
       before?: String;
@@ -1605,6 +2494,99 @@ export interface CommentSubscription
       last?: Int;
     }
   ) => T;
+  messages: <T = Promise<AsyncIterator<MessageSubscription>>>(
+    args?: {
+      where?: MessageWhereInput;
+      orderBy?: MessageOrderByInput;
+      skip?: Int;
+      after?: String;
+      before?: String;
+      first?: Int;
+      last?: Int;
+    }
+  ) => T;
+}
+
+export interface AggregateMessage {
+  count: Int;
+}
+
+export interface AggregateMessagePromise
+  extends Promise<AggregateMessage>,
+    Fragmentable {
+  count: () => Promise<Int>;
+}
+
+export interface AggregateMessageSubscription
+  extends Promise<AsyncIterator<AggregateMessage>>,
+    Fragmentable {
+  count: () => Promise<AsyncIterator<Int>>;
+}
+
+export interface ChatSubscriptionPayload {
+  mutation: MutationType;
+  updatedFields?: String[];
+}
+
+export interface ChatSubscriptionPayloadPromise
+  extends Promise<ChatSubscriptionPayload>,
+    Fragmentable {
+  mutation: () => Promise<MutationType>;
+  node: <T = ChatPromise>() => T;
+  updatedFields: () => Promise<String[]>;
+  previousValues: <T = ChatPreviousValuesPromise>() => T;
+}
+
+export interface ChatSubscriptionPayloadSubscription
+  extends Promise<AsyncIterator<ChatSubscriptionPayload>>,
+    Fragmentable {
+  mutation: () => Promise<AsyncIterator<MutationType>>;
+  node: <T = ChatSubscription>() => T;
+  updatedFields: () => Promise<AsyncIterator<String[]>>;
+  previousValues: <T = ChatPreviousValuesSubscription>() => T;
+}
+
+export interface MessageConnection {}
+
+export interface MessageConnectionPromise
+  extends Promise<MessageConnection>,
+    Fragmentable {
+  pageInfo: <T = PageInfoPromise>() => T;
+  edges: <T = FragmentableArray<MessageEdge>>() => T;
+  aggregate: <T = AggregateMessagePromise>() => T;
+}
+
+export interface MessageConnectionSubscription
+  extends Promise<AsyncIterator<MessageConnection>>,
+    Fragmentable {
+  pageInfo: <T = PageInfoSubscription>() => T;
+  edges: <T = Promise<AsyncIterator<MessageEdgeSubscription>>>() => T;
+  aggregate: <T = AggregateMessageSubscription>() => T;
+}
+
+export interface ChatPreviousValues {
+  id: ID_Output;
+  createdAt: DateTimeOutput;
+  updatedAt: DateTimeOutput;
+  name: String;
+}
+
+export interface ChatPreviousValuesPromise
+  extends Promise<ChatPreviousValues>,
+    Fragmentable {
+  id: () => Promise<ID_Output>;
+  createdAt: () => Promise<DateTimeOutput>;
+  updatedAt: () => Promise<DateTimeOutput>;
+  name: () => Promise<String>;
+}
+
+export interface ChatPreviousValuesSubscription
+  extends Promise<AsyncIterator<ChatPreviousValues>>,
+    Fragmentable {
+  id: () => Promise<AsyncIterator<ID_Output>>;
+  createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+  updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+  name: () => Promise<AsyncIterator<String>>;
 }
 
 export interface LikeEdge {
@@ -1621,6 +2603,49 @@ export interface LikeEdgeSubscription
     Fragmentable {
   node: <T = LikeSubscription>() => T;
   cursor: () => Promise<AsyncIterator<String>>;
+}
+
+export interface Message {
+  id: ID_Output;
+  createdAt: DateTimeOutput;
+  updatedAt: DateTimeOutput;
+  content: String;
+}
+
+export interface MessagePromise extends Promise<Message>, Fragmentable {
+  id: () => Promise<ID_Output>;
+  createdAt: () => Promise<DateTimeOutput>;
+  updatedAt: () => Promise<DateTimeOutput>;
+  chat: <T = ChatPromise>() => T;
+  author: <T = UserPromise>() => T;
+  content: () => Promise<String>;
+}
+
+export interface MessageSubscription
+  extends Promise<AsyncIterator<Message>>,
+    Fragmentable {
+  id: () => Promise<AsyncIterator<ID_Output>>;
+  createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+  updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+  chat: <T = ChatSubscription>() => T;
+  author: <T = UserSubscription>() => T;
+  content: () => Promise<AsyncIterator<String>>;
+}
+
+export interface AggregateComment {
+  count: Int;
+}
+
+export interface AggregateCommentPromise
+  extends Promise<AggregateComment>,
+    Fragmentable {
+  count: () => Promise<Int>;
+}
+
+export interface AggregateCommentSubscription
+  extends Promise<AsyncIterator<AggregateComment>>,
+    Fragmentable {
+  count: () => Promise<AsyncIterator<Int>>;
 }
 
 export interface CommentSubscriptionPayload {
@@ -1646,78 +2671,57 @@ export interface CommentSubscriptionPayloadSubscription
   previousValues: <T = CommentPreviousValuesSubscription>() => T;
 }
 
-export interface UserEdge {
-  cursor: String;
-}
+export interface CommentConnection {}
 
-export interface UserEdgePromise extends Promise<UserEdge>, Fragmentable {
-  node: <T = UserPromise>() => T;
-  cursor: () => Promise<String>;
-}
-
-export interface UserEdgeSubscription
-  extends Promise<AsyncIterator<UserEdge>>,
+export interface CommentConnectionPromise
+  extends Promise<CommentConnection>,
     Fragmentable {
-  node: <T = UserSubscription>() => T;
-  cursor: () => Promise<AsyncIterator<String>>;
+  pageInfo: <T = PageInfoPromise>() => T;
+  edges: <T = FragmentableArray<CommentEdge>>() => T;
+  aggregate: <T = AggregateCommentPromise>() => T;
 }
 
-export interface PostEdge {
-  cursor: String;
-}
-
-export interface PostEdgePromise extends Promise<PostEdge>, Fragmentable {
-  node: <T = PostPromise>() => T;
-  cursor: () => Promise<String>;
-}
-
-export interface PostEdgeSubscription
-  extends Promise<AsyncIterator<PostEdge>>,
+export interface CommentConnectionSubscription
+  extends Promise<AsyncIterator<CommentConnection>>,
     Fragmentable {
-  node: <T = PostSubscription>() => T;
-  cursor: () => Promise<AsyncIterator<String>>;
+  pageInfo: <T = PageInfoSubscription>() => T;
+  edges: <T = Promise<AsyncIterator<CommentEdgeSubscription>>>() => T;
+  aggregate: <T = AggregateCommentSubscription>() => T;
 }
 
-export interface LikePreviousValues {
+export interface CommentPreviousValues {
   id: ID_Output;
-  createdAt: DateTimeOutput;
+  content: String;
 }
 
-export interface LikePreviousValuesPromise
-  extends Promise<LikePreviousValues>,
+export interface CommentPreviousValuesPromise
+  extends Promise<CommentPreviousValues>,
     Fragmentable {
   id: () => Promise<ID_Output>;
-  createdAt: () => Promise<DateTimeOutput>;
+  content: () => Promise<String>;
 }
 
-export interface LikePreviousValuesSubscription
-  extends Promise<AsyncIterator<LikePreviousValues>>,
+export interface CommentPreviousValuesSubscription
+  extends Promise<AsyncIterator<CommentPreviousValues>>,
     Fragmentable {
   id: () => Promise<AsyncIterator<ID_Output>>;
-  createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+  content: () => Promise<AsyncIterator<String>>;
 }
 
-export interface LikeSubscriptionPayload {
-  mutation: MutationType;
-  updatedFields?: String[];
+export interface AggregatePost {
+  count: Int;
 }
 
-export interface LikeSubscriptionPayloadPromise
-  extends Promise<LikeSubscriptionPayload>,
+export interface AggregatePostPromise
+  extends Promise<AggregatePost>,
     Fragmentable {
-  mutation: () => Promise<MutationType>;
-  node: <T = LikePromise>() => T;
-  updatedFields: () => Promise<String[]>;
-  previousValues: <T = LikePreviousValuesPromise>() => T;
+  count: () => Promise<Int>;
 }
 
-export interface LikeSubscriptionPayloadSubscription
-  extends Promise<AsyncIterator<LikeSubscriptionPayload>>,
+export interface AggregatePostSubscription
+  extends Promise<AsyncIterator<AggregatePost>>,
     Fragmentable {
-  mutation: () => Promise<AsyncIterator<MutationType>>;
-  node: <T = LikeSubscription>() => T;
-  updatedFields: () => Promise<AsyncIterator<String[]>>;
-  previousValues: <T = LikePreviousValuesSubscription>() => T;
+  count: () => Promise<AsyncIterator<Int>>;
 }
 
 export interface PostSubscriptionPayload {
@@ -1743,39 +2747,125 @@ export interface PostSubscriptionPayloadSubscription
   previousValues: <T = PostPreviousValuesSubscription>() => T;
 }
 
-export interface CommentPreviousValues {
+export interface PostConnection {}
+
+export interface PostConnectionPromise
+  extends Promise<PostConnection>,
+    Fragmentable {
+  pageInfo: <T = PageInfoPromise>() => T;
+  edges: <T = FragmentableArray<PostEdge>>() => T;
+  aggregate: <T = AggregatePostPromise>() => T;
+}
+
+export interface PostConnectionSubscription
+  extends Promise<AsyncIterator<PostConnection>>,
+    Fragmentable {
+  pageInfo: <T = PageInfoSubscription>() => T;
+  edges: <T = Promise<AsyncIterator<PostEdgeSubscription>>>() => T;
+  aggregate: <T = AggregatePostSubscription>() => T;
+}
+
+export interface LikeSubscriptionPayload {
+  mutation: MutationType;
+  updatedFields?: String[];
+}
+
+export interface LikeSubscriptionPayloadPromise
+  extends Promise<LikeSubscriptionPayload>,
+    Fragmentable {
+  mutation: () => Promise<MutationType>;
+  node: <T = LikePromise>() => T;
+  updatedFields: () => Promise<String[]>;
+  previousValues: <T = LikePreviousValuesPromise>() => T;
+}
+
+export interface LikeSubscriptionPayloadSubscription
+  extends Promise<AsyncIterator<LikeSubscriptionPayload>>,
+    Fragmentable {
+  mutation: () => Promise<AsyncIterator<MutationType>>;
+  node: <T = LikeSubscription>() => T;
+  updatedFields: () => Promise<AsyncIterator<String[]>>;
+  previousValues: <T = LikePreviousValuesSubscription>() => T;
+}
+
+export interface AggregateLike {
+  count: Int;
+}
+
+export interface AggregateLikePromise
+  extends Promise<AggregateLike>,
+    Fragmentable {
+  count: () => Promise<Int>;
+}
+
+export interface AggregateLikeSubscription
+  extends Promise<AsyncIterator<AggregateLike>>,
+    Fragmentable {
+  count: () => Promise<AsyncIterator<Int>>;
+}
+
+export interface CommentEdge {
+  cursor: String;
+}
+
+export interface CommentEdgePromise extends Promise<CommentEdge>, Fragmentable {
+  node: <T = CommentPromise>() => T;
+  cursor: () => Promise<String>;
+}
+
+export interface CommentEdgeSubscription
+  extends Promise<AsyncIterator<CommentEdge>>,
+    Fragmentable {
+  node: <T = CommentSubscription>() => T;
+  cursor: () => Promise<AsyncIterator<String>>;
+}
+
+export interface MessagePreviousValues {
   id: ID_Output;
+  createdAt: DateTimeOutput;
+  updatedAt: DateTimeOutput;
   content: String;
 }
 
-export interface CommentPreviousValuesPromise
-  extends Promise<CommentPreviousValues>,
+export interface MessagePreviousValuesPromise
+  extends Promise<MessagePreviousValues>,
     Fragmentable {
   id: () => Promise<ID_Output>;
+  createdAt: () => Promise<DateTimeOutput>;
+  updatedAt: () => Promise<DateTimeOutput>;
   content: () => Promise<String>;
 }
 
-export interface CommentPreviousValuesSubscription
-  extends Promise<AsyncIterator<CommentPreviousValues>>,
+export interface MessagePreviousValuesSubscription
+  extends Promise<AsyncIterator<MessagePreviousValues>>,
     Fragmentable {
   id: () => Promise<AsyncIterator<ID_Output>>;
+  createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+  updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
   content: () => Promise<AsyncIterator<String>>;
 }
 
-export interface BatchPayload {
-  count: Long;
+export interface MessageSubscriptionPayload {
+  mutation: MutationType;
+  updatedFields?: String[];
 }
 
-export interface BatchPayloadPromise
-  extends Promise<BatchPayload>,
+export interface MessageSubscriptionPayloadPromise
+  extends Promise<MessageSubscriptionPayload>,
     Fragmentable {
-  count: () => Promise<Long>;
+  mutation: () => Promise<MutationType>;
+  node: <T = MessagePromise>() => T;
+  updatedFields: () => Promise<String[]>;
+  previousValues: <T = MessagePreviousValuesPromise>() => T;
 }
 
-export interface BatchPayloadSubscription
-  extends Promise<AsyncIterator<BatchPayload>>,
+export interface MessageSubscriptionPayloadSubscription
+  extends Promise<AsyncIterator<MessageSubscriptionPayload>>,
     Fragmentable {
-  count: () => Promise<AsyncIterator<Long>>;
+  mutation: () => Promise<AsyncIterator<MutationType>>;
+  node: <T = MessageSubscription>() => T;
+  updatedFields: () => Promise<AsyncIterator<String[]>>;
+  previousValues: <T = MessagePreviousValuesSubscription>() => T;
 }
 
 export interface User {
@@ -1818,6 +2908,39 @@ export interface UserPromise extends Promise<User>, Fragmentable {
     args?: {
       where?: LikeWhereInput;
       orderBy?: LikeOrderByInput;
+      skip?: Int;
+      after?: String;
+      before?: String;
+      first?: Int;
+      last?: Int;
+    }
+  ) => T;
+  chats: <T = FragmentableArray<Chat>>(
+    args?: {
+      where?: ChatWhereInput;
+      orderBy?: ChatOrderByInput;
+      skip?: Int;
+      after?: String;
+      before?: String;
+      first?: Int;
+      last?: Int;
+    }
+  ) => T;
+  myChats: <T = FragmentableArray<Chat>>(
+    args?: {
+      where?: ChatWhereInput;
+      orderBy?: ChatOrderByInput;
+      skip?: Int;
+      after?: String;
+      before?: String;
+      first?: Int;
+      last?: Int;
+    }
+  ) => T;
+  messages: <T = FragmentableArray<Message>>(
+    args?: {
+      where?: MessageWhereInput;
+      orderBy?: MessageOrderByInput;
       skip?: Int;
       after?: String;
       before?: String;
@@ -1868,6 +2991,74 @@ export interface UserSubscription
       last?: Int;
     }
   ) => T;
+  chats: <T = Promise<AsyncIterator<ChatSubscription>>>(
+    args?: {
+      where?: ChatWhereInput;
+      orderBy?: ChatOrderByInput;
+      skip?: Int;
+      after?: String;
+      before?: String;
+      first?: Int;
+      last?: Int;
+    }
+  ) => T;
+  myChats: <T = Promise<AsyncIterator<ChatSubscription>>>(
+    args?: {
+      where?: ChatWhereInput;
+      orderBy?: ChatOrderByInput;
+      skip?: Int;
+      after?: String;
+      before?: String;
+      first?: Int;
+      last?: Int;
+    }
+  ) => T;
+  messages: <T = Promise<AsyncIterator<MessageSubscription>>>(
+    args?: {
+      where?: MessageWhereInput;
+      orderBy?: MessageOrderByInput;
+      skip?: Int;
+      after?: String;
+      before?: String;
+      first?: Int;
+      last?: Int;
+    }
+  ) => T;
+}
+
+export interface LikePreviousValues {
+  id: ID_Output;
+  createdAt: DateTimeOutput;
+}
+
+export interface LikePreviousValuesPromise
+  extends Promise<LikePreviousValues>,
+    Fragmentable {
+  id: () => Promise<ID_Output>;
+  createdAt: () => Promise<DateTimeOutput>;
+}
+
+export interface LikePreviousValuesSubscription
+  extends Promise<AsyncIterator<LikePreviousValues>>,
+    Fragmentable {
+  id: () => Promise<AsyncIterator<ID_Output>>;
+  createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+}
+
+export interface UserEdge {
+  cursor: String;
+}
+
+export interface UserEdgePromise extends Promise<UserEdge>, Fragmentable {
+  node: <T = UserPromise>() => T;
+  cursor: () => Promise<String>;
+}
+
+export interface UserEdgeSubscription
+  extends Promise<AsyncIterator<UserEdge>>,
+    Fragmentable {
+  node: <T = UserSubscription>() => T;
+  cursor: () => Promise<AsyncIterator<String>>;
 }
 
 export interface LikeConnection {}
@@ -1888,20 +3079,36 @@ export interface LikeConnectionSubscription
   aggregate: <T = AggregateLikeSubscription>() => T;
 }
 
-export interface AggregateLike {
-  count: Int;
+export interface MessageEdge {
+  cursor: String;
 }
 
-export interface AggregateLikePromise
-  extends Promise<AggregateLike>,
-    Fragmentable {
-  count: () => Promise<Int>;
+export interface MessageEdgePromise extends Promise<MessageEdge>, Fragmentable {
+  node: <T = MessagePromise>() => T;
+  cursor: () => Promise<String>;
 }
 
-export interface AggregateLikeSubscription
-  extends Promise<AsyncIterator<AggregateLike>>,
+export interface MessageEdgeSubscription
+  extends Promise<AsyncIterator<MessageEdge>>,
     Fragmentable {
-  count: () => Promise<AsyncIterator<Int>>;
+  node: <T = MessageSubscription>() => T;
+  cursor: () => Promise<AsyncIterator<String>>;
+}
+
+export interface BatchPayload {
+  count: Long;
+}
+
+export interface BatchPayloadPromise
+  extends Promise<BatchPayload>,
+    Fragmentable {
+  count: () => Promise<Long>;
+}
+
+export interface BatchPayloadSubscription
+  extends Promise<AsyncIterator<BatchPayload>>,
+    Fragmentable {
+  count: () => Promise<AsyncIterator<Long>>;
 }
 
 /*
@@ -1923,11 +3130,6 @@ The `Int` scalar type represents non-fractional signed whole numeric values. Int
 export type Int = number;
 
 /*
-The `String` scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
-*/
-export type String = string;
-
-/*
 DateTime scalar input type, allowing Date
 */
 export type DateTimeInput = Date | string;
@@ -1937,17 +3139,30 @@ DateTime scalar output type, which is always a string
 */
 export type DateTimeOutput = string;
 
+/*
+The `String` scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
+*/
+export type String = string;
+
 /**
  * Model Metadata
  */
 
 export const models = [
   {
+    name: "Chat",
+    embedded: false
+  },
+  {
     name: "Comment",
     embedded: false
   },
   {
     name: "Like",
+    embedded: false
+  },
+  {
+    name: "Message",
     embedded: false
   },
   {

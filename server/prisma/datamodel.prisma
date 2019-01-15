@@ -5,7 +5,7 @@ type Post {
   published: Boolean! @default(value: "false")
   title: String!
   content: String!
-  author: User!
+  author: User! @relation(name: "UserPosts")
   comments: [Comment!]! @relation(name: "PostComments" onDelete: CASCADE)
   likes: [Like!]! @relation(name: "PostLikes" onDelete: CASCADE)
 }
@@ -16,14 +16,17 @@ type User {
   password: String!
   name: String!
   createdAt: DateTime!
-  posts: [Post!]!
-  comments: [Comment!]!
-  likes: [Like!]!
-}
+  posts: [Post!]! @relation(name: "UserPosts")
+  comments: [Comment!]! @relation(name: "UserComments")
+  likes: [Like!]! @relation(name: "LikeAuthor")
+  chats: [Chat!]! @relation(name: "UserChats")
+  myChats: [Chat!]! @relation(name: "ChatAuthor")
+  messages: [Message!]! @relation(name: "UserMessages")
+} 
 
 type Comment {
   id: ID! @unique
-  author: User!
+  author: User! @relation(name: "UserComments")
   content: String!
   post: Post! @relation(name: "PostComments")
   likes: [Like!]! @relation(name: "CommentLikes" onDelete: CASCADE)
@@ -32,7 +35,26 @@ type Comment {
 type Like {
   id: ID! @unique
   createdAt: DateTime!
-  author: User!
+  author: User! @relation(name: "LikeAuthor")
   post: Post @relation(name: "PostLikes")
   comment: Comment @relation(name: "CommentLikes")
+}
+
+type Chat {
+  id: ID! @unique
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  name: String!
+  author: User! @relation(name: "ChatAuthor")
+  users: [User!]! @relation(name: "UserChats")
+  messages: [Message!]! @relation(name: "ChatMessages" onDelete: CASCADE)
+}
+
+type Message {
+  id: ID! @unique
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  chat: Chat! @relation(name: "ChatMessages")
+  author: User! @relation(name: "UserMessages")
+  content: String!
 }
