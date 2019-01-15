@@ -49,6 +49,32 @@ const chat = {
       },
     })
   },
+  async kickChat(parent, { chatId, userId }, context) {
+    const chatExists = await context.prisma.$exists.chat({
+      id: chatId,
+    })
+    const userExists = await context.prisma.$exists.user({
+      id: userId,
+    })
+    if (!chatExists) {
+      throw new Error(`Chat not found`)
+    }
+    if (!userExists) {
+      throw new Error(`User not found`)
+    }
+    return context.prisma.updateChat({
+      data: {
+        users: {
+          disconnect: {
+            id: userId,
+          },
+        },
+      },
+      where: {
+        id: chatId,
+      },
+    })
+  },
 }
 
 module.exports = { chat }

@@ -15,6 +15,7 @@ class ChatPage extends Component {
     this.messageEdit = this.messageEdit.bind(this)
     this.messageSubmit = this.messageSubmit.bind(this)
     this.addUser = this.addUser.bind(this)
+    this.kickUser = this.kickUser.bind(this)
   }
 
   UNSAFE_componentWillReceiveProps(nextProps) {
@@ -45,6 +46,15 @@ class ChatPage extends Component {
 
   async addUser(userId) {
     await this.props.addUser({
+      variables: {
+        userId,
+        chatId: this.props.match.params.chatId,
+      },
+    })
+  }
+
+  async kickUser(userId) {
+    await this.props.kickUser({
       variables: {
         userId,
         chatId: this.props.match.params.chatId,
@@ -84,8 +94,12 @@ class ChatPage extends Component {
     return (
       <Fragment>
         <h1>Communication</h1>
+        <p>USERS</p>
         {this.props.chatQuery.chat.users.map(user => (
-          <li key={user.id}>{user.name}</li>
+            <li key={user.id}>
+            {user.name}
+            <button onClick={() => this.kickUser(user.id)}> Kick </button>
+          </li>
         ))}
         <p>ADD USER</p>
         {this.props.users.users
@@ -98,7 +112,7 @@ class ChatPage extends Component {
           .map(user => (
             <li key={user.id}>
               {user.name}
-              <button onClick={() => this.addUser(user.id)}>ADD</button>
+              <button onClick={() => this.addUser(user.id)}> ADD </button>
             </li>
           ))}
         <p>CHAT</p>
@@ -217,6 +231,18 @@ const ADD_USER = gql`
   }
 `
 
+const KICK_USER = gql`
+  mutation kickChat($userId: ID!, $chatId: ID!) {
+    kickChat(userId: $userId, chatId: $chatId) {
+     id
+     users {
+       id
+       name
+     }
+    }
+  }
+`
+
 export default compose(
   graphql(CHAT_QUERY, {
     name: 'chatQuery',
@@ -269,6 +295,9 @@ export default compose(
   }),
   graphql(ADD_USER, {
     name: 'addUser',
+  }),
+  graphql(KICK_USER, {
+    name: 'kickUser',
   }),
   withRouter,
 )(ChatPage)

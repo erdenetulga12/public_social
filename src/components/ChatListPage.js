@@ -52,7 +52,7 @@ class ChatListPage extends Component {
               <Link to={`chat/${chat.id}`}>{chat.name}</Link>
               &nbsp;
               <strong>by {chat.author.name}</strong>
-              <button onClick={() => this.deleteChat(chat.id)}>Delete</button>
+              {chat.isUserAuthor ? <button onClick={() => this.deleteChat(chat.id)}>Delete</button> : null}
               <br/>
             </Fragment>
           )
@@ -63,8 +63,8 @@ class ChatListPage extends Component {
 }
 
 const CHATS_QUERY = gql`
-  query chats {
-    chats {
+  query Chats {
+      chats {
       id
       name
       isUserAuthor
