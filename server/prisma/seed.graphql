@@ -32,4 +32,19 @@ mutation {
   }) {
     id
   }
+
+  user3: createUser(data: {
+    email: "erdenetulga12@gmail.com"
+    name: "Tuugii"
+    password: "$2a$10$oGmP2W26TQsS40y3MzmfTeLCt7LEDMDFcX4y.hbhJNxYJ4sIQHT4y"  # "secret43"
+    posts: {
+      create: [{
+        title: "Hello"
+        content: "Welcome"
+        published: true
+      }]
+    }
+  }) {
+    id
+  }
 }
