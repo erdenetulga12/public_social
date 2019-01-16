@@ -1,32 +1,31 @@
 import React, { Component, Fragment } from 'react'
 import Post from './Post'
-import { Query } from 'react-apollo'
-import gql from 'graphql-tag'
+import { graphql, Query } from 'react-apollo'
+import { gql } from 'apollo-boost'
 import { POSTS_PER_PAGE } from '../constant'
 
 export const FEED_QUERY = gql`
-  query FeedQuery($first: Int, $skip: Int, $orderBy: PostOrderByInput) {
-    feedlist(first: $first, skip: $skip, orderBy: $orderBy) {
-      posts {
+query FeedQuery($first: Int, $skip: Int, $orderBy: PostOrderByInput) {
+  feedlist(first: $first, skip: $skip, orderBy: $orderBy) {
+    posts {
+      id
+      createdAt
+      content
+      title
+      author {
         id
-        createdAt
-        content
-        title
+        name
+      }
+      likes {
+        id
         author {
           id
-          name
-        }
-        likes {
-          id
-          author {
-            id
-          }
         }
       }
-      count
     }
+    count
   }
-`
+}`
 
 const NEW_POSTS_SUBSCRIPTION = gql`
   subscription {
@@ -45,35 +44,6 @@ const NEW_POSTS_SUBSCRIPTION = gql`
           author {
             id
           }
-        }
-      }
-    }
-  }
-`
-
-const NEW_LIKES_SUBSCRIPTION = gql`
-  subscription {
-    newLike {
-      node {
-        id
-        post {
-          id
-          content
-          title
-          createdAt
-          author {
-            id
-            name
-          }
-          likes {
-            id
-            author {
-              id
-            }
-          }
-        }
-        author {
-          id
         }
       }
     }
@@ -103,22 +73,16 @@ class FeedList extends Component {
       document: NEW_POSTS_SUBSCRIPTION,
       updateQuery: (prev, { subscriptionData }) => {
         if (!subscriptionData.data) return prev
-        const feedSubscription = subscriptionData.data.feedSubscription.node
+        const newPost = subscriptionData.data.feedSubscription.node
 
         return Object.assign({}, prev, {
           feedlist: {
-            posts: [feedSubscription, ...prev.feedlist.posts],
+            posts: [newPost, ...prev.feedlist.posts],
             count: prev.feedlist.posts.length + 1,
             __typename: prev.feedlist.__typename
           }
         })
       }
-    })
-  }
-
-  _subscribeToNewLikes = subscribeToMore => {
-    subscribeToMore({
-      document: NEW_LIKES_SUBSCRIPTION
     })
   }
 
@@ -166,7 +130,6 @@ class FeedList extends Component {
           if (error) return <div>Error</div>
 
           this._subscribeToNewPosts(subscribeToMore)
-          this._subscribeToNewLikes(subscribeToMore)
 
           const postsToRender = this._getPostsToRender(data)
           const isNewPage = this.props.location.pathname.includes('new')
@@ -180,8 +143,8 @@ class FeedList extends Component {
                 <Post
                   key={post.id}
                   post={post}
+                  refresh={() => this.props.feedQuery.refetch()}
                   index={index + pageIndex}
-                  updateStoreAfterLike={this._updateCacheAfterLike}
                 />
               ))}
               {isNewPage && (
@@ -202,4 +165,9 @@ class FeedList extends Component {
   }
 }
 
-export default FeedList
+export default graphql(FEED_QUERY, {
+  name: 'feedQuery', // name of the injected prop: this.props.feedQuery...
+  options: {
+    fetchPolicy: 'network-only',
+  },
+})(FeedList)
