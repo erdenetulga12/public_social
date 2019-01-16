@@ -47,6 +47,7 @@ type Mutation {
 type Subscription {
   feedSubscription: Post
   chatSubscription(chatId: ID!): Message
+  newLike: Like
 }
 
 type AuthPayload {

@@ -1,9 +1,11 @@
 import React, { Component, Fragment } from 'react'
-import { graphql, compose } from 'react-apollo'
+import { graphql, compose, Mutation } from 'react-apollo'
 import { withRouter } from 'react-router-dom'
 import { gql } from 'apollo-boost'
 import Comment from './Comment'
 import CreateComment from './CreateComment'
+import { FEED_QUERY } from './FeedListPage'
+import { POSTS_PER_PAGE } from '../constant'
 
 class DetailPage extends Component {
   constructor(props) {
@@ -120,12 +122,35 @@ class DetailPage extends Component {
     if (!published) {
       return (
         <Fragment>
-          <a
-            className="f6 dim br1 ba ph3 pv2 mb2 dib black pointer"
-            onClick={() => this.publishDraft(id)}
+          <Mutation
+            mutation={PUBLISH_MUTATION}
+            variables={{ id }}
+            onCompleted={() => this.props.history.push('/new/1')}
+            update={(store, { data: { post } }) => {
+              const first = POSTS_PER_PAGE
+              const skip = 0
+              const orderBy = 'createdAt_DESC'
+              const data = store.readQuery({
+                query: FEED_QUERY,
+                variables: { first, skip, orderBy },
+              })
+              data.feed.links.unshift(post)
+              store.writeQuery({
+                query: FEED_QUERY,
+                data,
+                variables: { first, skip, orderBy },
+              })
+            }}
           >
-            Publish
-          </a>{' '}
+            {postMutation => (
+              <a
+                className="f6 dim br1 ba ph3 pv2 mb2 dib black pointer"
+                onClick={postMutation}
+              >
+                Publish
+              </a>
+            )}
+          </Mutation>{' '}
           <a
             className="f6 dim br1 ba ph3 pv2 mb2 dib black pointer"
             onClick={() => this.deletePost(id)}

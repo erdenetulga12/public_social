@@ -30,7 +30,7 @@ export const FEED_QUERY = gql`
 
 const NEW_POSTS_SUBSCRIPTION = gql`
   subscription {
-    newPost {
+    feedSubscription {
       node {
         id
         content
@@ -103,11 +103,11 @@ class FeedList extends Component {
       document: NEW_POSTS_SUBSCRIPTION,
       updateQuery: (prev, { subscriptionData }) => {
         if (!subscriptionData.data) return prev
-        const newPost = subscriptionData.data.newPost.node
+        const feedSubscription = subscriptionData.data.feedSubscription.node
 
         return Object.assign({}, prev, {
           feedlist: {
-            posts: [newPost, ...prev.feedlist.posts],
+            posts: [feedSubscription, ...prev.feedlist.posts],
             count: prev.feedlist.posts.length + 1,
             __typename: prev.feedlist.__typename
           }

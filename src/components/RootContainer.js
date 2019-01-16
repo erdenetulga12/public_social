@@ -174,8 +174,8 @@ class RootContainer extends Component {
     return (
       <div className="fl w-100 pl4 pr4">
         <Switch>
-          <Route exact path="/" component={FeedPage} />
-          <Route exact path="/list" render= {() => <Redirect to="/new/1"/>} />
+          <Route exact path="/retro" component={FeedPage}/>
+          <Route exact path="/" render= {() => <Redirect to="/new/1"/>} />
           <Route exact path="/new/:page" component={FeedList} />
           <Route exact path="/top" component={FeedList} />
           <ProtectedRoute
