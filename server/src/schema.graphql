@@ -1,5 +1,6 @@
 type Query {
   feed: [Post!]!
+  feedlist(filter: String, skip: Int, first: Int, orderBy: PostOrderByInput): Feed!
   drafts: [Post!]!
   post(id: ID!): Post
   comment(id: ID!): Comment
@@ -10,19 +11,19 @@ type Query {
   users: [User!]!
 }
 
-# type Feed {
-#   posts: [Post!]!
-#   count: Int!
-# }
+type Feed {
+  posts: [Post!]!
+  count: Int!
+}
 
-# enum PostOrderByInput {
-#   title_ASC
-#   title_DESC
-#   content_ASC
-#   content_DESC
-#   createdAt_ASC
-#   createdAt_DESC
-# }
+enum PostOrderByInput {
+  title_ASC
+  title_DESC
+  content_ASC
+  content_DESC
+  createdAt_ASC
+  createdAt_DESC
+}
 type Mutation {
   signup(email: String!, password: String!, name: String!): AuthPayload!
   login(email: String!, password: String!): AuthPayload!

@@ -8,6 +8,7 @@ import {
   Redirect,
 } from 'react-router-dom'
 import FeedPage from './FeedPage'
+import FeedList from './FeedListPage'
 import ChatPage from './ChatPage'
 import ChatListPage from './ChatListPage'
 import DraftsPage from './DraftsPage'
@@ -102,12 +103,12 @@ class RootContainer extends Component {
         >
           Feed
         </NavLink>
-        {/* <Link to="/top" className="ml1 no-underline black">
+        <Link to="/top" className="ml1 no-underline black">
           Top
         </Link>
         &nbsp;
         &nbsp;
-        &nbsp; */}
+        &nbsp;
         {this.props.data &&
           this.props.data.me &&
           this.props.data.me.email &&
@@ -174,9 +175,9 @@ class RootContainer extends Component {
       <div className="fl w-100 pl4 pr4">
         <Switch>
           <Route exact path="/" component={FeedPage} />
-          {/* render= {() => <Redirect to="/new/1"/>} />
-          <Route exact path="/new/:page" component={FeedPage} />
-          <Route exact path="/top" component={FeedPage} /> */}
+          <Route exact path="/list" render= {() => <Redirect to="/new/1"/>} />
+          <Route exact path="/new/:page" component={FeedList} />
+          <Route exact path="/top" component={FeedList} />
           <ProtectedRoute
             token={this.state.token}
             exact
