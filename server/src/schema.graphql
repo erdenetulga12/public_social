@@ -10,6 +10,19 @@ type Query {
   users: [User!]!
 }
 
+# type Feed {
+#   posts: [Post!]!
+#   count: Int!
+# }
+
+# enum PostOrderByInput {
+#   title_ASC
+#   title_DESC
+#   content_ASC
+#   content_DESC
+#   createdAt_ASC
+#   createdAt_DESC
+# }
 type Mutation {
   signup(email: String!, password: String!, name: String!): AuthPayload!
   login(email: String!, password: String!): AuthPayload!
@@ -54,6 +67,7 @@ type User {
 
 type Post {
   id: ID!
+  createdAt: String!
   published: Boolean!
   title: String!
   content: String!

@@ -4,6 +4,34 @@ const Query = {
   feed(parent, args, context) {
     return context.prisma.posts({ where: { published: true } })
   },
+    // const where = args.filter
+    //   ? {
+    //       OR: [
+    //         { title_contains: args.filter },
+    //         { content_contains: args.filter },
+    //         { published: true },
+    //       ],
+    //     }
+    //   : {
+    //       OR: [{ published: true }],
+    //     }
+
+    // const posts = context.prisma.posts({
+    //   where,
+    //   skip: args.skip,
+    //   first: args.first,
+    //   orderBy: args.orderBy
+    // })
+    // const count = context.prisma.postsConnection({
+    //   where,
+    // })
+    // .aggregate()
+    // .count()
+    // return {
+    //   posts,
+    //   count,
+    // },
+  //},
   drafts(parent, args, context) {
     const id = getUserId(context)
     const where = {
