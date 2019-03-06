@@ -18,6 +18,7 @@ import LoginPage from './LoginPage'
 import SignupPage from './SignupPage'
 import PageNotFound from './PageNotFound'
 import LogoutPage from './LogoutPage'
+import Posts from './Posts'
 import { AUTH_TOKEN } from '../constant'
 import { isTokenExpired } from '../helper/jwtHelper'
 import { graphql } from 'react-apollo'
@@ -177,6 +178,7 @@ class RootContainer extends Component {
           <Route exact path="/retro" component={FeedPage}/>
           <Route exact path="/" render= {() => <Redirect to="/new/1"/>} />
           <Route exact path="/new/:page" component={FeedList} />
+          <Route exact path="/posts" component={Posts} />
           <Route exact path="/top" component={FeedList} />
           <ProtectedRoute
             token={this.state.token}

@@ -167,7 +167,10 @@ class FeedList extends Component {
 
 export default graphql(FEED_QUERY, {
   name: 'feedQuery', // name of the injected prop: this.props.feedQuery...
-  options: {
+  options: props => {
+    console.log(props.location, 'location')
+    console.log(props.match, 'match')
+    return {
     fetchPolicy: 'network-only',
-  },
+  }},
 })(FeedList)

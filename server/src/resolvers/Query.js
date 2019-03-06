@@ -5,27 +5,29 @@ const Query = {
     return context.prisma.posts({ where: { published: true } })
   },
   feedlist(parent, args, context) {
-    const where = args.filter ? {
-        OR: [
-          { title_contains: args.filter },
-          { content_contains: args.filter },
-          { published: true },
-        ],
-    } : {
-      OR: [{ published: true }],
-    }
-
+    const where = args.filter
+      ? {
+          OR: [
+            { AND: [{ title_contains: args.filter }, { published: true }] },
+            { AND: [{ content_contains: args.filter }, { published: true }] },
+          ],
+        }
+      : {
+          OR: [{ published: true }],
+        }
+    console.log(where)
     const posts = context.prisma.posts({
       where,
       skip: args.skip,
       first: args.first,
-      orderBy: args.orderBy
+      orderBy: args.orderBy,
     })
-    const count = context.prisma.postsConnection({
-      where,
-    })
-    .aggregate()
-    .count()
+    const count = context.prisma
+      .postsConnection({
+        where,
+      })
+      .aggregate()
+      .count()
     return {
       posts,
       count,
