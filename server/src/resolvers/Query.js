@@ -15,7 +15,6 @@ const Query = {
       : {
           OR: [{ published: true }],
         }
-    console.log(where)
     const posts = context.prisma.posts({
       where,
       skip: args.skip,
