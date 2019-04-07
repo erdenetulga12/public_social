@@ -21,8 +21,7 @@ export default class CreateComment extends Component {
           value={this.state.content}
         />
         <input
-          className={`pa3 bg-black-10 bn ${this.state.content &&
-            'dim pointer'}`}
+          className={`pa3 bg-gray-10 bn ${this.state.content && 'dim pointer'}`}
           disabled={!this.state.content}
           type="submit"
           value="Add Comment"

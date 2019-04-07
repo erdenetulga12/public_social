@@ -9,10 +9,9 @@ class ChatListPage extends Component {
     this.deleteChat = this.deleteChat.bind(this)
     this.createChat = this.createChat.bind(this)
     this.state = {
-      name:'',
+      name: '',
     }
   }
-
 
   async createChat(name) {
     await this.props.createChat({
@@ -43,17 +42,21 @@ class ChatListPage extends Component {
           rows={3}
           value={this.state.name}
         />
-        <button onClick={() => this.createChat(this.state.name)}>CREATE CHAT ROOM</button>
-        <br/>
-        <br/>
+        <button onClick={() => this.createChat(this.state.name)}>
+          CREATE CHAT ROOM
+        </button>
+        <br />
+        <br />
         {this.props.chats.chats.map(chat => {
           return (
             <Fragment key={chat.id}>
               <Link to={`chat/${chat.id}`}>{chat.name}</Link>
               &nbsp;
               <strong>by {chat.author.name}</strong>
-              {chat.isUserAuthor ? <button onClick={() => this.deleteChat(chat.id)}>Delete</button> : null}
-              <br/>
+              {chat.isUserAuthor ? (
+                <button onClick={() => this.deleteChat(chat.id)}>Delete</button>
+              ) : null}
+              <br />
             </Fragment>
           )
         })}
@@ -64,7 +67,7 @@ class ChatListPage extends Component {
 
 const CHATS_QUERY = gql`
   query Chats {
-      chats {
+    chats {
       id
       name
       isUserAuthor

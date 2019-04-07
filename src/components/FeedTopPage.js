@@ -2,11 +2,10 @@ import React, { Component, Fragment } from 'react'
 import Post from './Post'
 import { graphql, Query } from 'react-apollo'
 import { gql } from 'apollo-boost'
-import { POSTS_PER_PAGE } from '../constant'
 
 export const FEED_QUERY = gql`
-  query FeedQuery($first: Int, $skip: Int, $orderBy: PostOrderByInput) {
-    feedlist(first: $first, skip: $skip, orderBy: $orderBy) {
+  query FeedQuery($orderBy: PostOrderByInput) {
+    feedlist(orderBy: $orderBy) {
       posts {
         id
         createdAt
@@ -51,17 +50,10 @@ const NEW_POSTS_SUBSCRIPTION = gql`
   }
 `
 
-class FeedList extends Component {
+class FeedTop extends Component {
   _updateCacheAfterLike = (store, createLike, postId) => {
-    const isNewPage = this.props.location.pathname.includes('new')
-    const page = parseInt(this.props.match.params.page, 10)
-
-    const skip = isNewPage ? (page - 1) * POSTS_PER_PAGE : 0
-    const first = isNewPage ? POSTS_PER_PAGE : 100
-    const orderBy = isNewPage ? 'createdAt_DESC' : null
     const data = store.readQuery({
       query: FEED_QUERY,
-      variables: { first, skip, orderBy },
     })
 
     const likedPost = data.feedlist.posts.find(post => post.id === postId)
@@ -87,40 +79,15 @@ class FeedList extends Component {
     })
   }
 
-  _getQueryVariables = () => {
-    const isNewPage = this.props.location.pathname.includes('new')
-    const page = parseInt(this.props.match.params.page, 10)
-
-    const skip = isNewPage ? (page - 1) * POSTS_PER_PAGE : 0
-    const first = isNewPage ? POSTS_PER_PAGE : 100
-    const orderBy = isNewPage ? 'createdAt_DESC' : null
-    return { first, skip, orderBy }
-  }
-
   _getPostsToRender = data => {
-    const isNewPage = this.props.location.pathname.includes('new')
-    if (isNewPage) {
-      return data.feedlist.posts
-    }
     const rankedPosts = data.feedlist.posts.slice()
     rankedPosts.sort((l1, l2) => l2.likes.length - l1.likes.length)
     return rankedPosts
   }
 
-  _nextPage = data => {
-    const page = parseInt(this.props.match.params.page, 10)
-    if (page <= data.feedlist.count / POSTS_PER_PAGE) {
-      const nextPage = page + 1
-      this.props.history.push(`/new/${nextPage}`)
-    }
-  }
-
-  _previousPage = () => {
-    const page = parseInt(this.props.match.params.page, 10)
-    if (page > 1) {
-      const previousPage = page - 1
-      this.props.history.push(`/new/${previousPage}`)
-    }
+  _getQueryVariables = () => {
+    const orderBy = 'createdAt_DESC'
+    return { orderBy }
   }
 
   render() {
@@ -133,10 +100,6 @@ class FeedList extends Component {
           this._subscribeToNewPosts(subscribeToMore)
 
           const postsToRender = this._getPostsToRender(data)
-          const isNewPage = this.props.location.pathname.includes('new')
-          const pageIndex = this.props.match.params.page
-            ? (this.props.match.params.page - 1) * POSTS_PER_PAGE
-            : 0
 
           return (
             <Fragment>
@@ -145,19 +108,8 @@ class FeedList extends Component {
                   key={post.id}
                   post={post}
                   refresh={() => this.props.feedQuery.refetch()}
-                  index={index + pageIndex}
                 />
               ))}
-              {isNewPage && (
-                <div className="flex ml4 mv3 gray">
-                  <div className="pointer mr2" onClick={this._previousPage}>
-                    Previous
-                  </div>
-                  <div className="pointer" onClick={() => this._nextPage(data)}>
-                    Next
-                  </div>
-                </div>
-              )}
             </Fragment>
           )
         }}
@@ -175,4 +127,4 @@ export default graphql(FEED_QUERY, {
       fetchPolicy: 'network-only',
     }
   },
-})(FeedList)
+})(FeedTop)

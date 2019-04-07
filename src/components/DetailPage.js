@@ -78,23 +78,23 @@ class DetailPage extends Component {
 
     return (
       <Fragment>
-        <h1 className="f3 black-80 fw4 lh-solid">
+        <h1 className="f2 white-80 fw4 lh-solid">
           {post.title} &nbsp;{post.isUserAuthor ? action : null}
         </h1>
-        <p className="black-80 fw3">{post.content}</p>
-        <p className="black-80 fw3">{post.likes.length}</p>
+        <p className="f4 white-80 fw3">{post.content}</p>
+        <p className="white-80 fw3">{post.likes.length}</p>
         {post.isUserAuthor ? null : (
           <p>
             {post.userPostLikeId ? (
               <a
-                className="f6 dim br1 ba ph3 pv2 mb2 dib black pointer"
+                className="f6 dim br1 ba ph3 pv2 mb2 dib"
                 onClick={() => this.dislike(post.userPostLikeId)}
               >
                 Dislike
               </a>
             ) : (
               <a
-                className="f6 dim br1 ba ph3 pv2 mb2 dib black pointer"
+                className="f6 dim br1 ba ph3 pv2 mb2 dib"
                 onClick={() => this.likePost()}
               >
                 Like
@@ -186,7 +186,7 @@ class DetailPage extends Component {
 }
 
 const POST_QUERY = gql`
-  query PostQuery($id: ID!) {
+  query postQuery($id: ID!) {
     post(id: $id) {
       id
       title
@@ -282,6 +282,7 @@ export default compose(
       variables: {
         id: props.match.params.id,
       },
+      fetchPolicy: 'network-only',
     }),
   }),
   graphql(PUBLISH_MUTATION, {

@@ -42,6 +42,70 @@ mutation {
         title: "Hello"
         content: "Welcome"
         published: true
+      }{
+        title: "Subscribe to GraphQL Weekly for community news"
+        content: "https://graphqlweekly.com/"
+        published: true
+      }{
+        title: "Subscribe to GraphQL Weekly for community news"
+        content: "https://graphqlweekly.com/"
+        published: true
+      }{
+        title: "Subscribe to GraphQL Weekly for community news"
+        content: "https://graphqlweekly.com/"
+        published: true
+      }{
+        title: "Subscribe to GraphQL Weekly for community news"
+        content: "https://graphqlweekly.com/"
+        published: true
+      }{
+        title: "Subscribe to GraphQL Weekly for community news"
+        content: "https://graphqlweekly.com/"
+        published: true
+      }{
+        title: "Subscribe to GraphQL Weekly for community news"
+        content: "https://graphqlweekly.com/"
+        published: true
+      }{
+        title: "Subscribe to GraphQL Weekly for community news"
+        content: "https://graphqlweekly.com/"
+        published: true
+      }{
+        title: "Subscribe to GraphQL Weekly for community news"
+        content: "https://graphqlweekly.com/"
+        published: true
+      }{
+        title: "Subscribe to GraphQL Weekly for community news"
+        content: "https://graphqlweekly.com/"
+        published: true
+      }{
+        title: "Subscribe to GraphQL Weekly for community news"
+        content: "https://graphqlweekly.com/"
+        published: true
+      }{
+        title: "Subscribe to GraphQL Weekly for community news"
+        content: "https://graphqlweekly.com/"
+        published: true
+      }{
+        title: "Subscribe to GraphQL Weekly for community news"
+        content: "https://graphqlweekly.com/"
+        published: true
+      }{
+        title: "Subscribe to GraphQL Weekly for community news"
+        content: "https://graphqlweekly.com/"
+        published: true
+      }{
+        title: "Subscribe to GraphQL Weekly for community news"
+        content: "https://graphqlweekly.com/"
+        published: true
+      }{
+        title: "Subscribe to GraphQL Weekly for community news"
+        content: "https://graphqlweekly.com/"
+        published: true
+      }{
+        title: "Subscribe to GraphQL Weekly for community news"
+        content: "https://graphqlweekly.com/"
+        published: true
       }]
     }
   }) {

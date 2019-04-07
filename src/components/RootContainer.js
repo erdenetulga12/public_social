@@ -7,7 +7,9 @@ import {
   Switch,
   Redirect,
 } from 'react-router-dom'
-import FeedPage from './FeedPage'
+import logo from '../assets/icon.jpg'
+import FeedInf from './FeedInf'
+import FeedTop from './FeedTopPage'
 import FeedList from './FeedListPage'
 import ChatPage from './ChatPage'
 import ChatListPage from './ChatListPage'
@@ -18,7 +20,7 @@ import LoginPage from './LoginPage'
 import SignupPage from './SignupPage'
 import PageNotFound from './PageNotFound'
 import LogoutPage from './LogoutPage'
-import Posts from './Posts'
+import FeedPage from './FeedPage'
 import { AUTH_TOKEN } from '../constant'
 import { isTokenExpired } from '../helper/jwtHelper'
 import { graphql } from 'react-apollo'
@@ -91,82 +93,79 @@ class RootContainer extends Component {
 
   renderNavBar() {
     return (
-      <nav className="pa3 pa4-ns">
-        <Link className="link dim black b f6 f5-ns dib mr3" to="/" title="Feed">
-          Blog
-        </Link>
-        <NavLink
-          className="link dim f6 f5-ns dib mr3 black"
-          activeClassName="gray"
-          exact={true}
-          to="/"
-          title="Feed"
-        >
-          Feed
-        </NavLink>
-        <Link to="/top" className="ml1 no-underline black">
-          Top
-        </Link>
-        &nbsp;
-        &nbsp;
-        &nbsp;
-        {this.props.data &&
-          this.props.data.me &&
-          this.props.data.me.email &&
-          this.state.token && (
-            <Fragment>
-              <NavLink
-                className="link dim f6 f5-ns dib mr3 black"
-                activeClassName="gray"
-                exact={true}
-                to="/drafts"
-                title="Drafts"
-              >
-                Drafts
-              </NavLink>
-              <NavLink
-                className="link dim f6 f5-ns dib mr3 black"
-                activeClassName="gray"
-                exact={true}
-                to="/chat"
-                title="Chats"
-              >
-                Chats
-              </NavLink>
-            </Fragment>
-          )}
-        {this.state.token ? (
-          <div
-            onClick={() => {
-              this.refreshTokenFn &&
-                this.refreshTokenFn({
-                  [AUTH_TOKEN]: null,
-                })
-              window.location.href = '/'
-            }}
-            className="f6 link dim br1 ba ph3 pv2 fr mb2 dib black"
+      <nav className="card card-body mb-3">
+        <nav className="pa3 pa4-n0s">
+          <NavLink
+            className="link dim ph3 pv2 f6 f5-ns dib mr3"
+            activeClassName="gray"
+            exact={true}
+            to="/"
+            title="Feed"
           >
-            Logout
-          </div>
-        ) : (
-          <Link
-            to="/login"
-            className="f6 link dim br1 ba ph3 pv2 fr mb2 dib black"
-          >
-            Login
+            <img
+              src={logo}
+              alt="Unearthing"
+              style={{ width: 40, margin: 'auto' }}
+            />
+          </NavLink>
+          <Link to="/top" className="link dim ba ph3 pv2 f6 f5-ns dib mr3">
+            Top
           </Link>
-        )}
-        {this.props.data &&
-          this.props.data.me &&
-          this.props.data.me.email &&
-          this.state.token && (
-            <Link
-              to="/create"
-              className="f6 link dim br1 ba ph3 pv2 fr mb2 dib black"
+          {this.props.data &&
+            this.props.data.me &&
+            this.props.data.me.email &&
+            this.state.token && (
+              <Fragment>
+                <NavLink
+                  className="link dim ba ph3 pv2 f6 f5-ns dib mr3"
+                  activeClassName="gray"
+                  exact={true}
+                  to="/drafts"
+                  title="Drafts"
+                >
+                  Drafts
+                </NavLink>
+                <NavLink
+                  className="link dim ba ph3 pv2 f6 f5-ns dib mr3"
+                  activeClassName="gray"
+                  exact={true}
+                  to="/chat"
+                  title="Chats"
+                >
+                  Chats
+                </NavLink>
+              </Fragment>
+            )}
+          {this.state.token ? (
+            <div
+              onClick={() => {
+                this.refreshTokenFn &&
+                  this.refreshTokenFn({
+                    [AUTH_TOKEN]: null,
+                  })
+                window.location.href = '/'
+              }}
+              className="f6 link dim br1 ba ph3 pv2 fr mb2 dib"
             >
-              + Create Draft
+              Logout
+            </div>
+          ) : (
+            <Link to="/login" className="f6 link dim br1 ba ph3 pv2 fr mb2 dib">
+              Login
             </Link>
           )}
+          {this.props.data &&
+            this.props.data.me &&
+            this.props.data.me.email &&
+            this.state.token && (
+              <Link
+                to="/create"
+                className="f6 link dim br1 ba ph3 pv2 fr mb2 dib"
+              >
+                + Create Draft
+              </Link>
+            )}
+        </nav>
       </nav>
     )
   }
@@ -175,11 +174,10 @@ class RootContainer extends Component {
     return (
       <div className="fl w-100 pl4 pr4">
         <Switch>
-          <Route exact path="/retro" component={FeedPage}/>
-          <Route exact path="/" render= {() => <Redirect to="/new/1"/>} />
+          <Route exact path="/Inf" component={FeedInf} />
           <Route exact path="/new/:page" component={FeedList} />
-          <Route exact path="/posts" component={Posts} />
-          <Route exact path="/top" component={FeedList} />
+          <Route exact path="/" component={FeedPage} />
+          <Route exact path="/top" component={FeedTop} />
           <ProtectedRoute
             token={this.state.token}
             exact
@@ -201,7 +199,11 @@ class RootContainer extends Component {
             path="/create"
             component={CreatePage}
           />
-          <Route path="/post/:id" component={DetailPage} />
+          <ProtectedRoute
+            token={this.state.token}
+            path="/post/:id"
+            component={DetailPage}
+          />
           <Route
             token={this.state.token}
             path="/login"

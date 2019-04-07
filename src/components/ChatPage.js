@@ -96,7 +96,7 @@ class ChatPage extends Component {
         <h1>Communication</h1>
         <p>USERS</p>
         {this.props.chatQuery.chat.users.map(user => (
-            <li key={user.id}>
+          <li key={user.id}>
             {user.name}
             <button onClick={() => this.kickUser(user.id)}> Kick </button>
           </li>
@@ -234,11 +234,11 @@ const ADD_USER = gql`
 const KICK_USER = gql`
   mutation kickChat($userId: ID!, $chatId: ID!) {
     kickChat(userId: $userId, chatId: $chatId) {
-     id
-     users {
-       id
-       name
-     }
+      id
+      users {
+        id
+        name
+      }
     }
   }
 `

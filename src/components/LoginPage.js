@@ -33,14 +33,15 @@ class LoginPage extends Component {
             onChange={e => this.setState({ password: e.target.value })}
             value={this.state.password}
           />
-          {this.state.email && this.state.password && (
-            <button
-              className="pa3 bg-black-10 bn dim ttu pointer"
-              onClick={this._login}
-            >
-              Log in
-            </button>
-          )}
+          {this.state.email &&
+            this.state.password && (
+              <button
+                className="pa3 bg-black-10 bn dim ttu pointer"
+                onClick={this._login}
+              >
+                Log in
+              </button>
+            )}
         </div>
       </div>
     )
